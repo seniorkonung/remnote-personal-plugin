@@ -234,7 +234,7 @@ export const dailyDocs = async (
 
     return _.zipWith(dailyRems, dailyNames, (rem, name) => {
         return { name, rem };
-    });
+    }).reverse();
 };
 
 interface Filter {
