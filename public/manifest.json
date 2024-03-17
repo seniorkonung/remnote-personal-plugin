@@ -1,22 +1,22 @@
 {
+  "author": "Valentin Panchenko",
+  "name": "Automatic summarization",
+  "description": "Adds power-ups and commands with which you can automate the whole tedious routine of summarizing your results",
+  "repoUrl": "https://github.com/seniorkonung/remnote-summarization-plugin",
+  "enableOnMobile": true,
+  "id": "automatic_summarization_for_seniorkonung",
+  "unlisted": true,
   "manifestVersion": 1,
-  "id": "plugin_template",
-  "name": "Plugin Template",
-  "author": "remnote",
-  "repoUrl": "",
   "version": {
     "major": 0,
     "minor": 0,
     "patch": 1
   },
-  "theme": [],
-  "enableOnMobile": false,
-  "description": "",
   "requestNative": false,
   "requiredScopes": [
     {
       "type": "All",
-      "level": "Read"
+      "level": "ReadCreateModifyDelete"
     }
   ]
 }
