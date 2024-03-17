@@ -1,9 +1,3 @@
-# Automatic summarization
+# Personal plugin
 
-Adds power-ups and commands with which you can automate the whole tedious routine of summarizing your results
-
-## Usage
-
-<!-- TODO: Describe usage -->
-
-<!-- ignore-after -->
+Contains functionality that allows you to automate many routine operations for a specific knowledge base.
