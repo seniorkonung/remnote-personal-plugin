@@ -1,6 +1,12 @@
 {
   "private": true,
-  "name": "remnote-plugin-template-react",
+  "author": {
+    "name": "Valentin Panchenko",
+    "email": "senior.konung@gmail.com",
+    "url": "https://github.com/seniorkonung"
+  },
+  "repository": "https://github.com/seniorkonung/remnote-personal-plugin.git",
+  "name": "seniorkonung_personal_plugin",
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
