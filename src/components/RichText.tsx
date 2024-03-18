@@ -16,19 +16,37 @@ export function RichText({ richText }: RichTextProps) {
     const html =
         SDK.useRunAsync(async () => {
             const html = await App.richTextToHtml(plugin, richText);
-            const ids = await plugin.richText.deepGetRemIdsFromRichText(richText);
+            const remsInfo = await _.asyncMap(
+                await plugin.richText.deepGetRemIdsFromRichText(richText),
+                async (id) => {
+                    const rem = await plugin.rem.findOne(id);
+                    const color = await rem?.getHighlightColor();
+                    return {
+                        id,
+                        color,
+                    };
+                }
+            );
 
             const node = document.createElement('div');
             node.innerHTML = html;
 
             _.forEach(node.querySelectorAll('a[isRemReference="true"]'), (a, i) => {
                 if (a instanceof HTMLAnchorElement === false) return;
-                a.style.color = '#7c6efa';
+                a.style.color = _.block(() => {
+                    const color = remsInfo.at(i)?.color
+                    if (_.isUndefined(color)) return '#7c6efa'
+                    else if (['Blue', 'Purple'].includes(color)) return 'white'
+                    else return 'black'
+                });
                 a.style.cursor = 'pointer';
                 a.style.textDecoration = 'underline';
                 a.style.textUnderlineOffset = '2px';
+                a.style.padding = '0.1em 0.3em';
+                a.style.borderRadius = '0.3em'
+                a.style.backgroundColor = remsInfo.at(i)?.color ?? ''
                 a.removeAttribute('href');
-                a.setAttribute('data-rem-id', ids.at(i) ?? '');
+                a.setAttribute('data-rem-id', remsInfo.at(i)?.id ?? '');
             });
 
             return node.innerHTML;
