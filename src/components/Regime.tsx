@@ -2,7 +2,7 @@ import * as App from '../App'
 import * as SDK from '@remnote/plugin-sdk'
 
 interface RegimeProps {
-    regime: App.Regime
+    readonly regime: App.Regime
 }
 
 export function Regime({ regime }: RegimeProps) {

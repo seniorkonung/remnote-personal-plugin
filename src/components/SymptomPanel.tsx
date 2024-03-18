@@ -5,7 +5,7 @@ import { Day } from './Day'
 import { Symptom } from './Symptom'
 
 interface SymptomPanelProps {
-    dailyDocs: App.DailyDoc[]
+    readonly dailyDocs: App.DailyDoc[]
 }
 
 export function SymptomPanel({ dailyDocs }: SymptomPanelProps) {

@@ -4,7 +4,7 @@ import * as React from 'react';
 import _ from 'lodash';
 
 interface RichTextProps {
-    richText?: SDK.RichTextInterface;
+    readonly richText?: SDK.RichTextInterface;
 }
 
 export function RichText({ richText }: RichTextProps) {

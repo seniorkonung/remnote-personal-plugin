@@ -4,7 +4,7 @@ import { Day } from './Day'
 import { Regime } from './Regime'
 
 interface RegimePanelProps {
-    dailyDocs: App.DailyDoc[]
+    readonly dailyDocs: App.DailyDoc[]
 }
 
 export function RegimePanel({ dailyDocs }: RegimePanelProps) {

@@ -3,8 +3,8 @@ import * as React from 'react';
 import * as SDK from '@remnote/plugin-sdk';
 
 interface DayProps {
-    dailyDoc: App.DailyDoc;
-    children: React.JSX.Element | React.JSX.Element[];
+    readonly dailyDoc: App.DailyDoc;
+    readonly children: React.JSX.Element | React.JSX.Element[];
 }
 
 export function Day({ dailyDoc, children }: DayProps) {

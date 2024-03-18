@@ -2,7 +2,7 @@ import * as App from '../App'
 import { RichText } from './RichText'
 
 interface SymptomProps {
-    symptom: App.Symptom
+    readonly symptom: App.Symptom
 }
 
 export function Symptom({ symptom }: SymptomProps) {

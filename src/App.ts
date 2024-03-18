@@ -214,8 +214,8 @@ export const richTextToString = async (
 };
 
 export interface DailyDoc {
-    name: string;
-    rem: SDK.Rem;
+    readonly name: string;
+    readonly rem: SDK.Rem;
 }
 
 const getDailyDoc = async (plugin: SDK.RNPlugin, day: Date): Promise<SDK.Rem | undefined> => {
@@ -283,9 +283,9 @@ const includesStringInRem =
     };
 
 export interface Symptom {
-    rem: SDK.Rem;
-    notes: {
-        rem: SDK.Rem;
+    readonly rem: SDK.Rem;
+    readonly notes: {
+        readonly rem: SDK.Rem;
     }[];
 }
 
@@ -315,13 +315,13 @@ export const symptoms = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise
 };
 
 export interface Regime {
-    startDay: string;
-    endDay: string;
-    waking?: SDK.Rem;
-    sleepQuolity?: SDK.Rem;
-    vigorLevel?: SDK.Rem;
-    wakingTime: string;
-    sleepTime: string;
+    readonly startDay: string;
+    readonly endDay: string;
+    readonly waking?: SDK.Rem;
+    readonly sleepQuolity?: SDK.Rem;
+    readonly vigorLevel?: SDK.Rem;
+    readonly wakingTime: string;
+    readonly sleepTime: string;
 }
 
 const parseMilitaryTimeToMinute = (time: string): number | undefined => {
@@ -432,10 +432,10 @@ export const regime = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<R
 };
 
 export interface Pomodoro {
-    rem: SDK.Rem;
-    isBad: boolean;
-    name: string;
-    value: number;
+    readonly rem: SDK.Rem;
+    readonly isBad: boolean;
+    readonly name: string;
+    readonly value: number;
 }
 
 const getRemObjectsFromRichText = async (
@@ -484,7 +484,7 @@ export const calculateTotalPomodoros = (listPomodoros: Pomodoro[][]): Pomodoro[]
 };
 
 interface Card {
-    rem: SDK.Rem;
+    readonly rem: SDK.Rem;
 }
 
 export interface Ritual extends Card {}
@@ -608,8 +608,8 @@ const splitAndFormatTextInHtml = (
 };
 
 interface Thesis {
-    text: string
-    color: string
+    readonly text: string
+    readonly color: string
 }
 
 const extractThesisFromHtml = (html: string): Thesis => {
@@ -657,17 +657,17 @@ const splitArray = <T>(arr: T[], isDelimiter: (i: T) => boolean): T[][] => {
 };
 
 export interface Food extends Card {
-    productRems: SDK.Rem[];
-    categories: string[];
-    portion: number;
-    unit: string;
+    readonly productRems: SDK.Rem[];
+    readonly categories: string[];
+    readonly portion: number;
+    readonly unit: string;
 }
 
 export interface Ration {
-    time: string;
-    hungerBefore: SDK.Rem;
-    hungerAfter: SDK.Rem;
-    foods: Food[][];
+    readonly time: string;
+    readonly hungerBefore: SDK.Rem;
+    readonly hungerAfter: SDK.Rem;
+    readonly foods: Food[][];
 }
 
 const extractUnitFromString = (str: string): string => {
@@ -769,14 +769,14 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
 };
 
 interface ProductTotal {
-    eaten: number;
-    unit: string;
+    readonly eaten: number;
+    readonly unit: string;
 }
 
 interface Product {
-    totals: ProductTotal[];
-    categories: string[];
-    foods: Food[];
+    readonly totals: ProductTotal[];
+    readonly categories: string[];
+    readonly foods: Food[];
 }
 
 const compareInaccurately = (str1: string, str2: string) => distance(str1, str2) > 0.75;
