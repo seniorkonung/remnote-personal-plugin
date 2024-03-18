@@ -192,11 +192,8 @@ export const formatDateWithOrdinal = (date: Date): string => {
 };
 
 export const richTextToHtml = async (plugin: SDK.RNPlugin, richText?: SDK.RichTextInterface): Promise<string> => {
-    const html = await plugin.richText.toHTML(richText ?? [])
-    if (_.isEmpty(html) === await plugin.richText.empty(richText ?? [])) return html
-
     const ids = await plugin.richText.deepGetRemIdsFromRichText(richText ?? [])
-    await _.asyncMap(ids, plugin.rem.findOne)
+    await _.asyncMap(ids, plugin.rem.findOne)    
     return await plugin.richText.toHTML(richText ?? []);
 };
 
