@@ -191,15 +191,29 @@ export const formatDateWithOrdinal = (date: Date): string => {
     return `${month} ${day}${nth(day)}, ${year}`;
 };
 
-const richTextToHtml = (plugin: SDK.RNPlugin, richText?: SDK.RichTextInterface): Promise<string> => {
-    return plugin.richText.toHTML(richText ?? ['']);
+export const richTextToHtml = async (plugin: SDK.RNPlugin, richText?: SDK.RichTextInterface): Promise<string> => {
+    const html = await plugin.richText.toHTML(richText ?? [])
+    if (_.isEmpty(html) === await plugin.richText.empty(richText ?? [])) return html
+
+    const ids = await plugin.richText.deepGetRemIdsFromRichText(richText ?? [])
+    await _.asyncMap(ids, plugin.rem.findOne)
+    return await plugin.richText.toHTML(richText ?? []);
 };
 
-const richTextToString = (
+const extractTextFromHtml = (html: string): string => {
+    const node = _.block(() => {
+        const node = document.createElement('div');
+        node.innerHTML = html;
+        return node;
+    })
+    return node.innerText
+}
+
+export const richTextToString = async (
     plugin: SDK.RNPlugin,
     richText?: SDK.RichTextInterface
 ): Promise<string> => {
-    return plugin.richText.toString(richText ?? ['']);
+    return extractTextFromHtml(await richTextToHtml(plugin, richText))
 };
 
 export interface DailyDoc {
@@ -373,10 +387,10 @@ export const regime = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<R
     };
 
     const startDayRem = await getOneRemInRegime(dailyRem, includesStringInRem(REM_TEXT_START_DAY));
-    const startDay = await richTextToHtml(plugin, startDayRem?.backText);
+    const startDay = await richTextToString(plugin, startDayRem?.backText);
 
     const endDayRem = await getOneRemInRegime(dailyRem, includesStringInRem(REM_TEXT_END_DAY));
-    const endDay = await richTextToHtml(plugin, endDayRem?.backText);
+    const endDay = await richTextToString(plugin, endDayRem?.backText);
 
     const isWakingRem = includesStringInRem(REM_TEXT_WAKING);
     const wakingRem = await getOneRemInRegime(dailyRem, isWakingRem);
@@ -411,11 +425,11 @@ export const regime = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<R
         vigorLevel: vigorLevelRem,
         wakingTime: await _.block(async () => {
             if (_.isUndefined(startDayMinute) || _.isUndefined(endDayMinute)) return '';
-            else return richTextToHtml(plugin, [wakingTime(startDayMinute, endDayMinute)]);
+            else return richTextToString(plugin, [wakingTime(startDayMinute, endDayMinute)]);
         }),
         sleepTime: await _.block(async () => {
             if (_.isUndefined(startDayMinute) || _.isUndefined(prevEndDayMinute)) return '';
-            else return richTextToHtml(plugin, [sleepTime(startDayMinute, prevEndDayMinute)]);
+            else return richTextToString(plugin, [sleepTime(startDayMinute, prevEndDayMinute)]);
         }),
     };
 };
@@ -451,7 +465,7 @@ export const pomodoros = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promis
         return {
             rem,
             isBad: (await referencedRem?.getHighlightColor()) === 'Red',
-            name: await richTextToHtml(plugin, rem?.text),
+            name: await richTextToString(plugin, rem?.text),
             value: _.toNumber(await richTextToString(plugin, rem.backText)),
         };
     });
@@ -601,7 +615,7 @@ interface Thesis {
     color: string
 }
 
-const extractTextFromHtml = (html: string): Thesis => {
+const extractThesisFromHtml = (html: string): Thesis => {
     const node = _.block(() => {
         const node = document.createElement('div');
         node.innerHTML = html;
@@ -634,7 +648,7 @@ export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<T
         },
         ',',
         '.'
-    ).map(extractTextFromHtml);
+    ).map(extractThesisFromHtml);
 };
 
 const splitArray = <T>(arr: T[], isDelimiter: (i: T) => boolean): T[][] => {
@@ -678,8 +692,8 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
         dailyRem,
         includesStringInRem(REM_TEXT_RATIONS),
         async (plugin, rem) => {
-            const html = await richTextToHtml(plugin, rem.text);
-            return _.isInteger(_.toNumber(html.charAt(0)));
+            const text = await richTextToString(plugin, rem.text);
+            return _.isInteger(_.toNumber(text.charAt(0)));
         }
     );
 
@@ -687,7 +701,7 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
         const timeRem = await getRems(plugin, rem, includesStringInRem(REM_TEXT_RATIONS_TIME)).then(
             _.first
         );
-        return richTextToHtml(plugin, timeRem?.backText);
+        return richTextToString(plugin, timeRem?.backText);
     });
 
     const listHungerBefore = await _.asyncMap(rationRems, async (rem) => {
@@ -731,12 +745,12 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
                 return (await richTextToString(plugin, categoryRem?.backText)).split(',');
             });
 
-            const value = await richTextToHtml(plugin, rem.backText);
+            const value = await richTextToString(plugin, rem.backText);
             return {
                 rem,
                 value,
                 productRems,
-                name: await richTextToHtml(plugin, rem.text),
+                name: await richTextToString(plugin, rem.text),
                 portion: extractPortionFromString(value),
                 unit: extractUnitFromString(value),
                 categories: _.flatten(categories),
@@ -860,8 +874,8 @@ export const removeEmptyChildProperties = async (
         if (_.isUndefined(referencedRem)) return false;
         if (!(await referencedRem.isProperty())) return false;
 
-        const html = await richTextToHtml(plugin, rem.backText);
-        const value = html.trim();
+        const backText = await richTextToString(plugin, rem.backText);
+        const value = backText.trim();
 
         if (value === 'No') return true;
         else if (value.length === 0) return true;

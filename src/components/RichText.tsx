@@ -15,7 +15,7 @@ export function RichText({ richText }: RichTextProps) {
 
     const html =
         SDK.useRunAsync(async () => {
-            const html = await plugin.richText.toHTML(richText);
+            const html = await App.richTextToHtml(plugin, richText);
             const ids = await plugin.richText.deepGetRemIdsFromRichText(richText);
 
             const node = document.createElement('div');
