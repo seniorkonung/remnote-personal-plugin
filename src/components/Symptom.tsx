@@ -11,7 +11,7 @@ export function Symptom({ symptom }: SymptomProps) {
             <RichText richText={symptom.rem.text} />
             <ul>
                 {symptom.notes.map((note) => {
-                    return <li className="mt-1" key={note.rem._id}><RichText richText={note.rem.text} /></li>
+                    return <li className="mt-2" key={note.rem._id}><RichText richText={note.rem.text} /></li>
                 })}
             </ul>            
         </li>
