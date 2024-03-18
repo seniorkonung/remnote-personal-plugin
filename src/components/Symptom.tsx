@@ -1,5 +1,5 @@
-import * as SDK from '@remnote/plugin-sdk'
 import * as App from '../App'
+import { RichText } from './RichText'
 
 interface SymptomProps {
     symptom: App.Symptom
@@ -7,13 +7,13 @@ interface SymptomProps {
 
 export function Symptom({ symptom }: SymptomProps) {
     return (
-        <div>
-            <SDK.RemViewer remId={symptom.rem._id} width='100%' height='auto' />
-            <div className='pl-3'>
+        <li>
+            <RichText richText={symptom.rem.text} />
+            <ul>
                 {symptom.notes.map((note) => {
-                    return <SDK.RemViewer key={note.rem._id} remId={note.rem._id} width='100%' height='auto' />
+                    return <li className="mt-1" key={note.rem._id}><RichText richText={note.rem.text} /></li>
                 })}
-            </div>            
-        </div>
+            </ul>            
+        </li>
     )
 }

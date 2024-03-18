@@ -16,7 +16,7 @@ export function SymptomPanel({ dailyDocs }: SymptomPanelProps) {
             const symptoms = await App.symptoms(plugin, dailyDoc.rem)
             return {dailyDoc, symptoms}
         })
-    }, [dailyDocs]) ?? []
+    }, [plugin, dailyDocs]) ?? []
 
     const days = dailyDocsAndSymptoms.map(({dailyDoc, symptoms}) => {
         return (
