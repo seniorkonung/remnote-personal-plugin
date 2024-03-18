@@ -5,10 +5,11 @@ import _ from 'lodash';
 
 interface RichTextProps {
     readonly richText?: SDK.RichTextInterface;
+    readonly defaultValue?: string | React.JSX.Element;
 }
 
-export function RichText({ richText }: RichTextProps) {
-    if (_.isUndefined(richText)) return <span></span>;
+export function RichText({ richText, defaultValue }: RichTextProps) {
+    if (_.isUndefined(richText)) return <span>{defaultValue}</span>;
 
     const plugin = SDK.usePlugin();
     const spanRef = React.useRef<HTMLSpanElement>(null);
@@ -34,17 +35,17 @@ export function RichText({ richText }: RichTextProps) {
             _.forEach(node.querySelectorAll('a[isRemReference="true"]'), (a, i) => {
                 if (a instanceof HTMLAnchorElement === false) return;
                 a.style.color = _.block(() => {
-                    const color = remsInfo.at(i)?.color
-                    if (_.isUndefined(color)) return '#7c6efa'
-                    else if (['Blue', 'Purple'].includes(color)) return 'white'
-                    else return 'black'
+                    const color = remsInfo.at(i)?.color;
+                    if (_.isUndefined(color)) return '#7c6efa';
+                    else if (['Blue', 'Purple'].includes(color)) return 'white';
+                    else return 'black';
                 });
                 a.style.cursor = 'pointer';
                 a.style.textDecoration = 'underline';
                 a.style.textUnderlineOffset = '2px';
                 a.style.padding = '0.1em 0.3em';
-                a.style.borderRadius = '0.3em'
-                a.style.backgroundColor = remsInfo.at(i)?.color ?? ''
+                a.style.borderRadius = '0.3em';
+                a.style.backgroundColor = remsInfo.at(i)?.color ?? '';
                 a.removeAttribute('href');
                 a.setAttribute('data-rem-id', remsInfo.at(i)?.id ?? '');
             });
@@ -78,5 +79,6 @@ export function RichText({ richText }: RichTextProps) {
         };
     }, [html]);
 
-    return <span ref={spanRef} dangerouslySetInnerHTML={{ __html: html }}></span>;
+    if (_.isEmpty(html.trim())) return <span>{defaultValue}</span>;
+    else return <span ref={spanRef} dangerouslySetInnerHTML={{ __html: html }}></span>;
 }
