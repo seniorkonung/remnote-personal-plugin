@@ -1,33 +1,63 @@
-import * as App from '../App'
-import * as SDK from '@remnote/plugin-sdk'
+import * as App from '../App';
+import { RichText } from './RichText';
 
 interface RegimeProps {
-    readonly regime: App.Regime
+    readonly regime: App.Regime;
 }
 
 export function Regime({ regime }: RegimeProps) {
     return (
-        <div>
-            <p>{App.REM_TEXT_START_DAY}</p>
-            {/* <span dangerouslySetInnerHTML={{ __html: regime.startDay }}></span> */}
-            
-            <p>{App.REM_TEXT_END_DAY}</p>
-            {/* <span dangerouslySetInnerHTML={{ __html: regime.endDay }}></span> */}
-            
-            <p>{App.REM_TEXT_WAKING}</p>
-            {/* <span dangerouslySetInnerHTML={{ __html: regime.waking }}></span> */}
-            
-            <p>{App.REM_TEXT_SLEEP_QUOLITY}</p>
-            {/* <span dangerouslySetInnerHTML={{ __html: regime.sleepQuolity }}></span> */}
-            
-            <p>{App.REM_TEXT_VIGOR_LEVEL}</p>
-            {/* <span dangerouslySetInnerHTML={{ __html: regime.vigorLevel }}></span> */}
-            
-            <p>{App.REM_TEXT_WAKING_TIME}</p>
-            {/* <span dangerouslySetInnerHTML={{ __html: regime.wakingTime }}></span> */}
-            
-            <p>{App.REM_TEXT_SLEEP_TIME}</p>
-            {/* <span dangerouslySetInnerHTML={{ __html: regime.sleepTime }}></span> */}
+        <div className="grid grid-cols-2 px-2 ">
+            <div>
+                <p className="font-medium">{App.REM_TEXT_START_DAY}:</p>
+                <p className="italic" style={{ letterSpacing: '0.05em' }}>
+                    {regime.startDay || '-'}
+                </p>
+            </div>
+
+            <div>
+                <p className="font-medium">{App.REM_TEXT_WAKING_TIME}:</p>
+                <p className="italic" style={{ letterSpacing: '0.05em' }}>
+                    {regime.wakingTime || '-'}
+                </p>
+            </div>
+
+            <div>
+                <p className="font-medium">{App.REM_TEXT_END_DAY}:</p>
+                <p className="italic" style={{ letterSpacing: '0.05em' }}>
+                    {regime.endDay || '-'}
+                </p>
+            </div>
+
+            <div>
+                <p className="font-medium">{App.REM_TEXT_SLEEP_TIME}:</p>
+                <p className="italic" style={{ letterSpacing: '0.05em' }}>
+                    {regime.sleepTime || '-'}
+                </p>
+            </div>
+
+            <div className="col-span-2">
+                <div className="flex gap-2">
+                    <p className="font-medium">{App.REM_TEXT_WAKING}:</p>
+                    <p className="italic" style={{ letterSpacing: '0.025em' }}>
+                        <RichText richText={regime.waking?.backText} defaultValue={'-'} />
+                    </p>
+                </div>
+
+                <div className="flex gap-2">
+                    <p className="font-medium">{App.REM_TEXT_VIGOR_LEVEL}:</p>
+                    <p className="italic" style={{ letterSpacing: '0.025em' }}>
+                        <RichText richText={regime.vigorLevel?.backText} defaultValue={'-'} />
+                    </p>
+                </div>
+
+                <div className="flex gap-2">
+                    <p className="font-medium">{App.REM_TEXT_SLEEP_QUOLITY}:</p>
+                    <p className="italic" style={{ letterSpacing: '0.025em' }}>
+                        <RichText richText={regime.sleepQuolity?.backText} defaultValue={'-'} />
+                    </p>
+                </div>
+            </div>
         </div>
-    )
+    );
 }

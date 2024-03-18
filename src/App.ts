@@ -255,7 +255,7 @@ const getRems = async (
     rem: SDK.Rem,
     ...filters: Filter[]
 ): Promise<SDK.Rem[]> => {
-    if (filters.length === 0) return [rem];
+    if (_.isEmpty(filters)) return [rem];
     const [filter, ...tailFilters] = filters;
 
     const filteredRem = await _.block(async () => {
@@ -579,7 +579,7 @@ const splitAndFormatTextInHtml = (
     });
 
     const deepSplit = (text: string, separators: string[]): string[] => {
-        if (separators.length === 0) return [text];
+        if (_.isEmpty(separators)) return [text];
         const [separator, ...tailSeparators] = separators;
         return text.split(separator).flatMap((text) => {
             return deepSplit(text, tailSeparators);
@@ -640,7 +640,7 @@ export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<T
     return splitAndFormatTextInHtml(
         await richTextToHtml(plugin, thesesRem?.text),
         (text) => {
-            if (text.trim().length === 0) return false;
+            if (_.isEmpty(text.trim())) return false;
             else return _.upperFirst(text.trim());
         },
         ',',
@@ -875,7 +875,7 @@ export const removeEmptyChildProperties = async (
         const value = backText.trim();
 
         if (value === 'No') return true;
-        else if (value.length === 0) return true;
+        else if (_.isEmpty(value.length)) return true;
         else return false;
     });
 
