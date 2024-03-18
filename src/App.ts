@@ -191,9 +191,7 @@ export const formatDateWithOrdinal = (date: Date): string => {
     return `${month} ${day}${nth(day)}, ${year}`;
 };
 
-type Html = string;
-
-const richTextToHtml = (plugin: SDK.RNPlugin, richText?: SDK.RichTextInterface): Promise<Html> => {
+const richTextToHtml = (plugin: SDK.RNPlugin, richText?: SDK.RichTextInterface): Promise<string> => {
     return plugin.richText.toHTML(richText ?? ['']);
 };
 
@@ -205,7 +203,7 @@ const richTextToString = (
 };
 
 export interface DailyDoc {
-    name: Html;
+    name: string;
     rem: SDK.Rem;
 }
 
@@ -229,7 +227,7 @@ export const dailyDocs = async (
     });
 
     const dailyNames = await _.asyncMap(dailyRems, async (rem) => {
-        return richTextToHtml(plugin, rem?.text);
+        return richTextToString(plugin, rem?.text);
     });
 
     return _.zipWith(dailyRems, dailyNames, (rem, name) => {
@@ -274,10 +272,8 @@ const includesStringInRem =
     };
 
 export interface Symptom {
-    name: Html;
     rem: SDK.Rem;
     notes: {
-        text: Html;
         rem: SDK.Rem;
     }[];
 }
@@ -296,13 +292,11 @@ export const symptoms = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise
     return _.asyncMap(symptomRems, async (symptomRem) => {
         const notes = await _.asyncMap(await symptomRem.getChildrenRem(), async (noteRem) => {
             return {
-                text: await richTextToHtml(plugin, noteRem.text),
                 rem: noteRem,
             };
         });
 
         return {
-            name: await richTextToHtml(plugin, symptomRem.text),
             rem: symptomRem,
             notes,
         };
@@ -310,13 +304,13 @@ export const symptoms = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise
 };
 
 export interface Regime {
-    startDay: Html;
-    endDay: Html;
-    waking: Html;
-    sleepQuolity: Html;
-    vigorLevel: Html;
-    wakingTime: Html;
-    sleepTime: Html;
+    startDay: string;
+    endDay: string;
+    waking?: SDK.Rem;
+    sleepQuolity?: SDK.Rem;
+    vigorLevel?: SDK.Rem;
+    wakingTime: string;
+    sleepTime: string;
 }
 
 const parseMilitaryTimeToMinute = (time: string): number | undefined => {
@@ -386,15 +380,12 @@ export const regime = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<R
 
     const isWakingRem = includesStringInRem(REM_TEXT_WAKING);
     const wakingRem = await getOneRemInRegime(dailyRem, isWakingRem);
-    const waking = await richTextToHtml(plugin, wakingRem?.backText);
 
     const isSleepQuolityRem = includesStringInRem(REM_TEXT_SLEEP_QUOLITY);
     const sleepQuolityRem = await getOneRemInRegime(dailyRem, isSleepQuolityRem);
-    const sleepQuolity = await richTextToHtml(plugin, sleepQuolityRem?.backText);
 
     const isVigorLevelRem = includesStringInRem(REM_TEXT_VIGOR_LEVEL);
     const vigorLevelRem = await getOneRemInRegime(dailyRem, isVigorLevelRem);
-    const vigorLevel = await richTextToHtml(plugin, vigorLevelRem?.backText);
 
     const prevEndDayRem = await _.block(async () => {
         const prevDayRem = await prevDailyDoc(plugin, dailyRem);
@@ -415,9 +406,9 @@ export const regime = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<R
     return {
         startDay,
         endDay,
-        waking,
-        sleepQuolity,
-        vigorLevel,
+        waking: wakingRem,
+        sleepQuolity: sleepQuolityRem,
+        vigorLevel: vigorLevelRem,
         wakingTime: await _.block(async () => {
             if (_.isUndefined(startDayMinute) || _.isUndefined(endDayMinute)) return '';
             else return richTextToHtml(plugin, [wakingTime(startDayMinute, endDayMinute)]);
@@ -432,7 +423,7 @@ export const regime = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<R
 export interface Pomodoro {
     rem: SDK.Rem;
     isBad: boolean;
-    name: Html;
+    name: string;
     value: number;
 }
 
@@ -482,8 +473,6 @@ export const calculateTotalPomodoros = (listPomodoros: Pomodoro[][]): Pomodoro[]
 };
 
 interface Card {
-    name: Html;
-    value: Html;
     rem: SDK.Rem;
 }
 
@@ -498,16 +487,9 @@ export const rituals = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
         async (_, rem) => !(await rem.isPowerupProperty())
     );
 
-    const names = await _.asyncMap(ritualRems, async (rem) => {
-        return richTextToHtml(plugin, rem.text);
-    });
-    const values = await _.asyncMap(ritualRems, async (rem) => {
-        return richTextToHtml(plugin, rem.backText);
-    });
-
-    return _.zipWith(ritualRems, names, values, (rem, name, value) => {
-        return { name, value, rem };
-    });
+    return ritualRems.map(rem => {
+        return { rem }
+    })
 };
 
 export interface Other extends Card {}
@@ -521,26 +503,19 @@ export const others = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<O
         async (_, rem) => !(await rem.isPowerupProperty())
     );
 
-    const names = await _.asyncMap(otherRems, async (rem) => {
-        return richTextToHtml(plugin, rem.text);
-    });
-    const values = await _.asyncMap(otherRems, async (rem) => {
-        return richTextToHtml(plugin, rem.backText);
-    });
-
-    return _.zipWith(otherRems, names, values, (rem, name, value) => {
-        return { name, value, rem };
-    });
+    return otherRems.map(rem => {
+        return { rem }
+    })
 };
 
-export const version = (dailyDocName: Html): number => {
+export const version = (dailyDocName: string): number => {
     const dateOfDay = convertOrdinalDateToDate(dailyDocName);
     if (_.isUndefined(dateOfDay)) return -1;
     const msInDay = 1000 * 60 * 60 * 24;
     return _.ceil((dateOfDay.getTime() - VERSION_START_DAY.getTime()) / msInDay) + 1;
 };
 
-export const daysUntilEndOfMonth = (dailyDocName: Html): number => {
+export const daysUntilEndOfMonth = (dailyDocName: string): number => {
     const dateOfDay = convertOrdinalDateToDate(dailyDocName);
     if (_.isUndefined(dateOfDay)) return -1;
     const lastDay = new Date(dateOfDay.getFullYear(), dateOfDay.getMonth() + 1, 0);
@@ -581,10 +556,10 @@ const hasTagInRem: (tagName: string) => Filter = (tagName) => async (plugin, rem
 };
 
 const splitAndFormatTextInHtml = (
-    html: Node | Html,
+    html: Node | string,
     format: (text: string) => string | false,
     ...separators: string[]
-): Html[] => {
+): string[] => {
     const node = _.block(() => {
         if (_.isString(html) === false) return html;
         const node = document.createElement('div');
@@ -603,7 +578,7 @@ const splitAndFormatTextInHtml = (
     if (node.nodeType === node.TEXT_NODE) {
         return deepSplit(node.textContent ?? '', separators)
             .map(format)
-            .filter((text): text is Html => text !== false)
+            .filter((text): text is string => text !== false)
             .map((text) => {
                 if (_.isNull(node?.parentNode?.parentNode)) return text;
 
@@ -612,7 +587,7 @@ const splitAndFormatTextInHtml = (
                 if ('outerHTML' in cloneNode === false) return text;
 
                 cloneNode.innerText = text;
-                return cloneNode.outerHTML as Html;
+                return cloneNode.outerHTML as string;
             });
     } else {
         return _.flatMap(node.childNodes, (node) => {
@@ -621,7 +596,29 @@ const splitAndFormatTextInHtml = (
     }
 };
 
-export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<Html[]> => {
+interface Thesis {
+    text: string
+    color: string
+}
+
+const extractTextFromHtml = (html: string): Thesis => {
+    const node = _.block(() => {
+        const node = document.createElement('div');
+        node.innerHTML = html;
+        return node;
+    })
+
+    return {
+        text: node.innerText,
+        color: _.block(() => {
+            const mark = node.querySelector('mark')
+            if (_.isNull(mark)) return ''
+            return mark.style.backgroundColor
+        })
+    }
+}
+
+export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<Thesis[]> => {
     const thesesRem = await getRems(
         plugin,
         dailyRem,
@@ -629,16 +626,15 @@ export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<H
         hasTagInRem(REM_TEXT_THESIS)
     ).then(_.head);
 
-    const html = await richTextToHtml(plugin, thesesRem?.text);
     return splitAndFormatTextInHtml(
-        html,
+        await richTextToHtml(plugin, thesesRem?.text),
         (text) => {
             if (text.trim().length === 0) return false;
             else return _.upperFirst(text.trim());
         },
         ',',
         '.'
-    );
+    ).map(extractTextFromHtml);
 };
 
 const splitArray = <T>(arr: T[], isDelimiter: (i: T) => boolean): T[][] => {
@@ -657,18 +653,18 @@ export interface Food extends Card {
 }
 
 export interface Ration {
-    time: Html;
-    hungerBefore: Html;
-    hungerAfter: Html;
+    time: string;
+    hungerBefore: SDK.Rem;
+    hungerAfter: SDK.Rem;
     foods: Food[][];
 }
 
-const extractUnitFromHtml = (html: Html): string => {
-    return html.replace(/.+?([A-zА-я]+)/, '$1');
+const extractUnitFromString = (str: string): string => {
+    return str.replace(/.+?([A-zА-я]+)/, '$1');
 };
 
-const extractPortionFromHtml = (html: Html): number => {
-    const d = html.match(/\d+/g)?.map(_.toNumber);
+const extractPortionFromString = (str: string): number => {
+    const d = str.match(/\d+/g)?.map(_.toNumber);
     if (!d) return 0;
     else if (d.length === 1) return d[0];
     else if (d.length === 2) return _.floor((d[0] / d[1]) * 100) / 100;
@@ -695,22 +691,20 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
     });
 
     const listHungerBefore = await _.asyncMap(rationRems, async (rem) => {
-        const hungerBeforeRem = await getRems(
+        return getRems(
             plugin,
             rem,
             includesStringInRem(REM_TEXT_RATIONS_HUNGER_BEFORE)
         ).then(_.first);
-        return richTextToHtml(plugin, hungerBeforeRem?.backText);
-    });
+    }).then(FP.filter(_.isNotUndefined));
 
     const listHungerAfter = await _.asyncMap(rationRems, async (rem) => {
-        const hungerAfterRem = await getRems(
+        return getRems(
             plugin,
             rem,
             includesStringInRem(REM_TEXT_RATIONS_HUNGER_AFTER)
         ).then(_.first);
-        return richTextToHtml(plugin, hungerAfterRem?.backText);
-    });
+    }).then(FP.filter(_.isNotUndefined));
 
     const listFoods = await _.asyncMap(rationRems, async (rem) => {
         const foodRems = await getRems(plugin, rem, async (__, rem) => {
@@ -743,8 +737,8 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
                 value,
                 productRems,
                 name: await richTextToHtml(plugin, rem.text),
-                portion: extractPortionFromHtml(value),
-                unit: extractUnitFromHtml(value),
+                portion: extractPortionFromString(value),
+                unit: extractUnitFromString(value),
                 categories: _.flatten(categories),
             };
         });
