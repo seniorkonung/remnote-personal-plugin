@@ -1,15 +1,6 @@
 import * as App from '../App'
 import * as SDK from '@remnote/plugin-sdk'
 
-interface RichTextProps {
-    text?: SDK.RichTextInterface
-}
-
-function RichText({ text }: RichTextProps) {
-    if (text) return <SDK.RichText text={text} width='100%' height='auto' />
-    else return null
-}
-
 interface RegimeProps {
     regime: App.Regime
 }

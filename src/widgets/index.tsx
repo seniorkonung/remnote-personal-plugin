@@ -4,6 +4,7 @@ import _ from 'lodash';
 import '../styles/style.css';
 
 const NAVIGATION_POWERUP = 'navigation_powerup';
+const TOTALS_POWERUP = 'totals_powerup'
 
 const EventQueueCompleteCard = _.once((plugin: SDK.RNPlugin) => {
     return {
@@ -16,15 +17,48 @@ const EventQueueCompleteCard = _.once((plugin: SDK.RNPlugin) => {
 });
 
 async function onActivate(plugin: SDK.ReactRNPlugin) {
-    await plugin.app.registerWidget('totals', SDK.WidgetLocation.Pane, {
-        dimensions: { height: 'auto', width: '100%' },
+    await plugin.app.registerPowerup({
+        code: TOTALS_POWERUP,
+        name: 'Итоги',
+        description: '',
+        options: {
+            properties: []
+        }
+    })
+
+    const totalsPowerup = await plugin.powerup.getPowerupByCode(TOTALS_POWERUP)
+    if (_.isUndefined(totalsPowerup)) return
+
+    const mainTotalsRem = await _.block(async () => {
+        const children = await totalsPowerup?.getChildrenRem()
+        if (_.isNotUndefined(children) && children.length > 0) return children[0]
+        
+        const mainRem = await plugin.rem.createRem()
+        if (_.isUndefined(mainRem)) return
+        
+        await mainRem.setParent(totalsPowerup ?? null)
+        return mainRem
+    })
+    if (_.isUndefined(mainTotalsRem)) return
+
+
+    await plugin.app.registerWidget('totals', SDK.WidgetLocation.UnderRemEditor, {
+        remIdFilter: mainTotalsRem._id,
     });
+
+    await plugin.app.registerCSS('Styles for powerup totals', `
+        div[data-document-id="${totalsPowerup._id}"] .rn-add-rem-button { display: none }
+        div[data-node-id="${mainTotalsRem._id}"], div[data-children-node-id="${mainTotalsRem._id}"] { display: none; }
+        div[data-document-id="${totalsPowerup._id}"] #document { max-width: 100% }
+        div[data-rem-container-id="${mainTotalsRem._id}"] div:has(> .rn-plugin-root) { height: 80vh; padding-top: 1.5rem }
+        div[data-children-node-id="${totalsPowerup._id}"] > div:nth-last-child(2) { display: none }
+    `)
 
     await plugin.app.registerSidebarButton({
         id: 'open_totals_widget',
         name: 'Итоги',
         async action() {
-            await plugin.window.openWidgetInPane('totals');
+            await totalsPowerup.openRemAsPage()
         },
     });
 
@@ -88,8 +122,6 @@ async function onActivate(plugin: SDK.ReactRNPlugin) {
         EventQueueCompleteCard(plugin).listenerKey,
         EventQueueCompleteCard(plugin).handler
     );
-
-    plugin.onDeactivate
 
     await plugin.app.toast('Плагин итогов успешно был запущен!');
 }
