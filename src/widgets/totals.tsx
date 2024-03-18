@@ -5,10 +5,17 @@ import { SymptomPanel } from '../components/SymptomPanel';
 import { RegimePanel } from '../components/RegimePanel';
 
 function useDateFilter() {
-    const [selectedYear, setSelectedYear] = React.useState(() => App.years()[0]);
-    const [selectedMonth, setSelectedMonth] = React.useState(() => App.months(selectedYear)[0]);
-    const [selectedSprint, setSelectedSprint] = React.useState(
-        () => App.sprints(selectedYear, selectedMonth)[0]
+    const [selectedYear, setSelectedYear] = SDK.useSessionStorageState(
+        'selected_year',
+        App.years()[0]
+    );
+    const [selectedMonth, setSelectedMonth] = SDK.useSessionStorageState(
+        'selected_month',
+        App.months(selectedYear)[0]
+    );
+    const [selectedSprint, setSelectedSprint] = SDK.useSessionStorageState(
+        'selected_sprint',
+        App.sprints(selectedYear, selectedMonth)[0]
     );
     return {
         selectedYear,
@@ -32,7 +39,10 @@ function useDateFilter() {
 }
 
 function useFilterType() {
-    const [selectedType, setSelectedType] = React.useState(App.TYPES.MAIN);
+    const [selectedType, setSelectedType] = SDK.useSessionStorageState(
+        'selected_type',
+        App.TYPES.MAIN
+    );
     return {
         isMain: () => selectedType === App.TYPES.MAIN,
         isNutrition: () => selectedType === App.TYPES.NUTRITION,
@@ -62,7 +72,7 @@ function Totals() {
     const dailyDocs =
         SDK.useRunAsync(async () => {
             return App.dailyDocs(plugin, selectedYear, selectedMonth, selectedSprint);
-        }, [selectedYear, selectedMonth, selectedSprint]) ?? [];
+        }, [plugin, selectedYear, selectedMonth, selectedSprint]) ?? [];
 
     return (
         <div className="overflow-y-scroll px-2">
