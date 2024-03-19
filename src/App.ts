@@ -19,14 +19,14 @@ export const MONTHS = [
 ];
 
 export enum TYPES {
-    MAIN = 'Главное',
-    NUTRITION = 'Питание',
-    POMODORO = 'Помидоры',
-    RATIONS = 'Рационы',
-    SYMPTOMS = 'Симптомы',
-    REGIME = 'Режим',
-    RITUALS = 'Ритуалы',
-    OTHER = 'Другое',
+    MAIN = '🏠 Главное',
+    NUTRITION = '🍱 Питание',
+    POMODORO = '🍅 Помидоры',
+    RATIONS = '🍽️ Рационы',
+    SYMPTOMS = '🌡️ Симптомы',
+    REGIME = '🛏️ Режим',
+    RITUALS = '🛞 Ритуалы',
+    OTHER = '💬 Другое',
 }
 
 const STARTING_YEAR = 2023;
