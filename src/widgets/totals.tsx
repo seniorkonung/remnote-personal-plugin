@@ -1,8 +1,8 @@
 import * as SDK from '@remnote/plugin-sdk';
 import * as App from '../App';
-import * as React from 'react';
 import { SymptomPanel } from '../components/SymptomPanel';
 import { RegimePanel } from '../components/RegimePanel';
+import { PomodoroPanel } from '../components/PomodoPanel';
 
 function useDateFilter() {
     const [selectedYear, setSelectedYear] = SDK.useSessionStorageState(
@@ -162,6 +162,7 @@ function Totals() {
             <div className="mt-8">
                 {type.isSymptoms() && <SymptomPanel dailyDocs={dailyDocs} />}
                 {type.isRegime() && <RegimePanel dailyDocs={dailyDocs} />}
+                {type.isPomodoro() && <PomodoroPanel dailyDocs={dailyDocs} />}
             </div>
         </div>
     );

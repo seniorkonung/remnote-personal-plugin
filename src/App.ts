@@ -468,7 +468,7 @@ export const pomodoros = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promis
     });
 };
 
-export const calculateTotalPomodoros = (listPomodoros: Pomodoro[][]): Pomodoro[] => {
+export const calculateTotalsPomodoros = (listPomodoros: Pomodoro[][]): Pomodoro[] => {
     const groupOfPomodoros = _.groupBy(_.flatten(listPomodoros), ({ name }) => name);
     return _.chain(groupOfPomodoros)
         .map((pomodoros) => {
