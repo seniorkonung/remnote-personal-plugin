@@ -7,7 +7,7 @@ interface PomodoroProps {
 
 export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
     return (
-        <div className="flex gap-2 content-center">
+        <div className="flex gap-2 items-center">
             <div
                 className="w-1"
                 style={{
@@ -18,7 +18,7 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
 
             {isTotal ? (
                 <p
-                    className="font-medium my-2 my-1 px-2 rounded-md"
+                    className="font-medium my-2 my-1 px-2 py-1 rounded-md"
                     style={{
                         letterSpacing: '0.01em',
                         color: 'white',
@@ -39,7 +39,7 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
             )}
 
             <p
-                className="italic my-2 flex gap-1.5 content-center"
+                className="italic my-2 flex gap-2 content-center"
                 style={{
                     letterSpacing: '0.025em',
                 }}

@@ -49,22 +49,25 @@ export function Regime({ regime }: RegimeProps) {
             </div>
 
             <div className="col-span-2">
-                <div className="flex gap-2">
-                    <p className="font-medium my-3">{App.REM_TEXT_WAKING} — </p>
+                <div className="flex gap-2 items-center">
+                    <p className="font-medium my-3">{App.REM_TEXT_WAKING}</p>
+                    <span>—</span>
                     <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
                         <RichText richText={regime.waking?.backText} defaultValue={'-'} />
                     </p>
                 </div>
 
-                <div className="flex gap-2">
-                    <p className="font-medium my-3">{App.REM_TEXT_VIGOR_LEVEL} — </p>
+                <div className="flex gap-2 items-center">
+                    <p className="font-medium my-3">{App.REM_TEXT_VIGOR_LEVEL}</p>
+                    <span>—</span>
                     <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
                         <RichText richText={regime.vigorLevel?.backText} defaultValue={'-'} />
                     </p>
                 </div>
 
-                <div className="flex gap-2">
-                    <p className="font-medium my-3">{App.REM_TEXT_SLEEP_QUOLITY} — </p>
+                <div className="flex gap-2 items-center">
+                    <p className="font-medium my-3">{App.REM_TEXT_SLEEP_QUOLITY}</p>
+                    <span>—</span>
                     <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
                         <RichText richText={regime.sleepQuolity?.backText} defaultValue={'-'} />
                     </p>
