@@ -250,7 +250,7 @@ interface Filter {
     (plugin: SDK.RNPlugin, rem: SDK.Rem): Promise<boolean>;
 }
 
-const getRems = async (
+export const getRems = async (
     plugin: SDK.RNPlugin,
     rem: SDK.Rem,
     ...filters: Filter[]
@@ -483,11 +483,9 @@ export const calculateTotalsPomodoros = (listPomodoros: Pomodoro[][]): Pomodoro[
         .value();
 };
 
-interface Card {
+export interface Ritual {
     readonly rem: SDK.Rem;
 }
-
-export interface Ritual extends Card {}
 
 export const rituals = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<Ritual[]> => {
     const ritualRems = await getRems(
@@ -503,7 +501,9 @@ export const rituals = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
     })
 };
 
-export interface Other extends Card {}
+export interface Other {
+    readonly rem: SDK.Rem;
+}
 
 export const others = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<Other[]> => {
     const otherRems = await getRems(
@@ -656,7 +656,8 @@ const splitArray = <T>(arr: T[], isDelimiter: (i: T) => boolean): T[][] => {
     }, [] as T[][]);
 };
 
-export interface Food extends Card {
+export interface Food {
+    readonly rem: SDK.Rem;
     readonly productRems: SDK.Rem[];
     readonly categories: string[];
     readonly portion: number;

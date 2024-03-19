@@ -21,10 +21,20 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
                 await plugin.richText.deepGetRemIdsFromRichText(richText),
                 async (id) => {
                     const rem = await plugin.rem.findOne(id);
-                    const color = await rem?.getHighlightColor();
                     return {
                         id,
-                        color,
+                        color: await rem?.getHighlightColor(),
+                        icon: await _.block(async () => {
+                            if (_.isUndefined(rem)) return
+
+                            const iconRem = await App.getRems(plugin, rem, async (plugin, rem) => {
+                                const text = await App.richTextToString(plugin, rem.text)
+                                return text.includes('Bullet Icon')
+                            }).then(_.head)
+                            
+                            if (_.isUndefined(iconRem)) return
+                            else return App.richTextToString(plugin, iconRem.backText)
+                        })
                     };
                 }
             );
@@ -49,6 +59,11 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
                     a.style.padding = '0.1em 0.3em';
                     a.style.borderRadius = '0.3em';
                     a.style.backgroundColor = remsInfo.at(i)?.color ?? '';
+                }
+
+                const icon = remsInfo.at(i)?.icon                
+                if (_.isNotUndefined(icon)) {
+                    a.innerHTML = `<span>${icon}</span>` + '&nbsp;&nbsp;' + a.innerHTML
                 }
                 
                 a.removeAttribute('href');
