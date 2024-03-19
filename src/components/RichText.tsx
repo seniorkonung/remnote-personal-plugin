@@ -34,8 +34,9 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
 
             _.forEach(node.querySelectorAll('a[isRemReference="true"]'), (a, i) => {
                 if (a instanceof HTMLAnchorElement === false) return;
+                
+                const color = remsInfo.at(i)?.color;
                 a.style.color = _.block(() => {
-                    const color = remsInfo.at(i)?.color;
                     if (_.isUndefined(color)) return '#7c6efa';
                     else if (['Blue', 'Purple'].includes(color)) return 'white';
                     else return 'black';
@@ -43,9 +44,13 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
                 a.style.cursor = 'pointer';
                 a.style.textDecoration = 'underline';
                 a.style.textUnderlineOffset = '2px';
-                a.style.padding = '0.1em 0.3em';
-                a.style.borderRadius = '0.3em';
-                a.style.backgroundColor = remsInfo.at(i)?.color ?? '';
+
+                if (_.isNotUndefined(color)) {
+                    a.style.padding = '0.1em 0.3em';
+                    a.style.borderRadius = '0.3em';
+                    a.style.backgroundColor = remsInfo.at(i)?.color ?? '';
+                }
+                
                 a.removeAttribute('href');
                 a.setAttribute('data-rem-id', remsInfo.at(i)?.id ?? '');
             });
