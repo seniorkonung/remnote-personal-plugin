@@ -12,7 +12,7 @@ export function Symptom({ symptom }: SymptomProps) {
             <ul>
                 {symptom.notes.map((note) => {
                     return (
-                        <li className="mt-2" key={note.rem._id}>
+                        <li className="mt-3" key={note.rem._id}>
                             <RichText richText={note.rem.text} />
                         </li>
                     );

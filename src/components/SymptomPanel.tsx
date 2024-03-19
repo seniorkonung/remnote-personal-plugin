@@ -22,9 +22,9 @@ export function SymptomPanel({ dailyDocs }: SymptomPanelProps) {
     const days = dailyDocsAndSymptoms.map(({ dailyDoc, symptoms }) => {
         return (
             <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
-                <ul className="grid gap-2">
+                <ul className="grid gap-3">
                     {symptoms.map((symptom) => {
-                        return <Symptom key={symptom.rem._id} symptom={symptom}></Symptom>;
+                        return <Symptom key={symptom.rem._id} symptom={symptom} />;
                     })}
                 </ul>
             </Day>
