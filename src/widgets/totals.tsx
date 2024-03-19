@@ -3,6 +3,7 @@ import * as App from '../App';
 import { SymptomPanel } from '../components/SymptomPanel';
 import { RegimePanel } from '../components/RegimePanel';
 import { PomodoroPanel } from '../components/PomodoPanel';
+import { RitualPanel } from '../components/RitualPanel';
 
 function useDateFilter() {
     const [selectedYear, setSelectedYear] = SDK.useSessionStorageState(
@@ -160,9 +161,15 @@ function Totals() {
             </form>
 
             <div className="mt-8">
-                {type.isSymptoms() && <SymptomPanel dailyDocs={dailyDocs} />}
-                {type.isRegime() && <RegimePanel dailyDocs={dailyDocs} />}
-                {type.isPomodoro() && <PomodoroPanel dailyDocs={dailyDocs} />}
+                {type.isSymptoms() ? (
+                    <SymptomPanel dailyDocs={dailyDocs} />
+                ) : type.isRegime() ? (
+                    <RegimePanel dailyDocs={dailyDocs} />
+                ) : type.isPomodoro() ? (
+                    <PomodoroPanel dailyDocs={dailyDocs} />
+                ) : type.isRituals() ? (
+                    <RitualPanel dailyDocs={dailyDocs} />
+                ) : null}
             </div>
         </div>
     );
