@@ -18,14 +18,14 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
 
             {isTotal ? (
                 <p
-                    className="font-medium my-2 py-1 px-2 rounded-md"
+                    className="font-medium my-2 my-1 px-2 rounded-md"
                     style={{
                         letterSpacing: '0.01em',
                         color: 'white',
                         backgroundColor: 'blue',
                     }}
                 >
-                    {pomodoro.name}:
+                    {pomodoro.name}
                 </p>
             ) : (
                 <p
@@ -34,20 +34,19 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
                         letterSpacing: '0.01em',
                     }}
                 >
-                    {pomodoro.name}:
+                    {pomodoro.name}
                 </p>
             )}
 
             <p
-                className="italic my-2"
+                className="italic my-2 flex gap-1.5 content-center"
                 style={{
                     letterSpacing: '0.025em',
                 }}
             >
-                <span className="font-bold align-middle">{pomodoro.value}</span>{' '}
-                <span className="align-middle" style={{ opacity: '.75' }}>
-                    пом.
-                </span>
+                <span>—</span>
+                <span className="font-bold">{pomodoro.value}</span>
+                <span style={{ opacity: '.75' }}>пом.</span>
             </p>
         </div>
     );
