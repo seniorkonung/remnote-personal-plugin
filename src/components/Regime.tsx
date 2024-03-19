@@ -10,28 +10,40 @@ export function Regime({ regime }: RegimeProps) {
         <div className="grid grid-cols-2 px-2">
             <div>
                 <p className="font-medium my-3">{App.REM_TEXT_START_DAY}:</p>
-                <p className="italic my-3 underline underline-offset-4" style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}>
+                <p
+                    className="italic my-3 underline underline-offset-4"
+                    style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}
+                >
                     {regime.startDay || '-'}
                 </p>
             </div>
 
             <div>
                 <p className="font-medium my-3">{App.REM_TEXT_WAKING_TIME}:</p>
-                <p className="italic my-3 underline underline-offset-4" style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}>
+                <p
+                    className="italic my-3 underline underline-offset-4"
+                    style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}
+                >
                     {regime.wakingTime || '-'}
                 </p>
             </div>
 
             <div>
                 <p className="font-medium my-3">{App.REM_TEXT_END_DAY}:</p>
-                <p className="italic my-3 underline underline-offset-4" style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}>
+                <p
+                    className="italic my-3 underline underline-offset-4"
+                    style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}
+                >
                     {regime.endDay || '-'}
                 </p>
             </div>
 
             <div>
                 <p className="font-medium my-3">{App.REM_TEXT_SLEEP_TIME}:</p>
-                <p className="italic my-3 underline underline-offset-4" style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}>
+                <p
+                    className="italic my-3 underline underline-offset-4"
+                    style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}
+                >
                     {regime.sleepTime || '-'}
                 </p>
             </div>

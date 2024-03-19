@@ -25,16 +25,16 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
                         id,
                         color: await rem?.getHighlightColor(),
                         icon: await _.block(async () => {
-                            if (_.isUndefined(rem)) return
+                            if (_.isUndefined(rem)) return;
 
                             const iconRem = await App.getRems(plugin, rem, async (plugin, rem) => {
-                                const text = await App.richTextToString(plugin, rem.text)
-                                return text.includes('Bullet Icon')
-                            }).then(_.head)
-                            
-                            if (_.isUndefined(iconRem)) return
-                            else return App.richTextToString(plugin, iconRem.backText)
-                        })
+                                const text = await App.richTextToString(plugin, rem.text);
+                                return text.includes('Bullet Icon');
+                            }).then(_.head);
+
+                            if (_.isUndefined(iconRem)) return;
+                            else return App.richTextToString(plugin, iconRem.backText);
+                        }),
                     };
                 }
             );
@@ -44,7 +44,7 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
 
             _.forEach(node.querySelectorAll('a[isRemReference="true"]'), (a, i) => {
                 if (a instanceof HTMLAnchorElement === false) return;
-                
+
                 const color = remsInfo.at(i)?.color;
                 a.style.color = _.block(() => {
                     if (_.isUndefined(color)) return '#7c6efa';
@@ -61,11 +61,11 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
                     a.style.backgroundColor = remsInfo.at(i)?.color ?? '';
                 }
 
-                const icon = remsInfo.at(i)?.icon                
+                const icon = remsInfo.at(i)?.icon;
                 if (_.isNotUndefined(icon)) {
-                    a.innerHTML = `<span>${icon}</span>` + '&nbsp;&nbsp;' + a.innerHTML
+                    a.innerHTML = `<span>${icon}</span>` + '&nbsp;&nbsp;' + a.innerHTML;
                 }
-                
+
                 a.removeAttribute('href');
                 a.setAttribute('data-rem-id', remsInfo.at(i)?.id ?? '');
             });
