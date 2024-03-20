@@ -39,18 +39,13 @@ export function Ration({ ration }: RationProps) {
                     </span>
                 </span>
                 <div className="flex gap-1.5">
-                    <span>
-                        <span>⛽ </span>
-                        <span className="italic" style={{ letterSpacing: '0.025em' }}>
-                            <RichText richText={ration.hungerBefore?.backText} defaultValue="-" />
-                        </span>
+                    <span>⛽ </span>
+                    <span className="italic" style={{ letterSpacing: '0.025em' }}>
+                        <RichText richText={ration.hungerBefore?.backText} defaultValue="-" />
                     </span>
                     <span className="font-medium">→</span>
-                    <span>
-                        <span>⛽ </span>
-                        <span className="italic" style={{ letterSpacing: '0.025em' }}>
-                            <RichText richText={ration.hungerAfter?.backText} defaultValue="-" />
-                        </span>
+                    <span className="italic" style={{ letterSpacing: '0.025em' }}>
+                        <RichText richText={ration.hungerAfter?.backText} defaultValue="-" />
                     </span>
                 </div>
             </div>
