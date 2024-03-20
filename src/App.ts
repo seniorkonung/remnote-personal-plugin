@@ -191,9 +191,12 @@ export const formatDateWithOrdinal = (date: Date): string => {
     return `${month} ${day}${nth(day)}, ${year}`;
 };
 
-export const richTextToHtml = async (plugin: SDK.RNPlugin, richText?: SDK.RichTextInterface): Promise<string> => {
-    const ids = await plugin.richText.deepGetRemIdsFromRichText(richText ?? [])
-    await _.asyncMap(ids, plugin.rem.findOne)    
+export const richTextToHtml = async (
+    plugin: SDK.RNPlugin,
+    richText?: SDK.RichTextInterface
+): Promise<string> => {
+    const ids = await plugin.richText.deepGetRemIdsFromRichText(richText ?? []);
+    await _.asyncMap(ids, plugin.rem.findOne);
     return await plugin.richText.toHTML(richText ?? []);
 };
 
@@ -202,15 +205,15 @@ const extractTextFromHtml = (html: string): string => {
         const node = document.createElement('div');
         node.innerHTML = html;
         return node;
-    })
-    return node.innerText
-}
+    });
+    return node.innerText;
+};
 
 export const richTextToString = async (
     plugin: SDK.RNPlugin,
     richText?: SDK.RichTextInterface
 ): Promise<string> => {
-    return extractTextFromHtml(await richTextToHtml(plugin, richText))
+    return extractTextFromHtml(await richTextToHtml(plugin, richText));
 };
 
 export interface DailyDoc {
@@ -496,9 +499,9 @@ export const rituals = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
         async (_, rem) => !(await rem.isPowerupProperty())
     );
 
-    return ritualRems.map(rem => {
-        return { rem }
-    })
+    return ritualRems.map((rem) => {
+        return { rem };
+    });
 };
 
 export interface Other {
@@ -514,9 +517,9 @@ export const others = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<O
         async (_, rem) => !(await rem.isPowerupProperty())
     );
 
-    return otherRems.map(rem => {
-        return { rem }
-    })
+    return otherRems.map((rem) => {
+        return { rem };
+    });
 };
 
 export const version = (dailyDocName: string): number => {
@@ -608,8 +611,8 @@ const splitAndFormatTextInHtml = (
 };
 
 interface Thesis {
-    readonly text: string
-    readonly color: string
+    readonly text: string;
+    readonly color: string;
 }
 
 const extractThesisFromHtml = (html: string): Thesis => {
@@ -617,17 +620,17 @@ const extractThesisFromHtml = (html: string): Thesis => {
         const node = document.createElement('div');
         node.innerHTML = html;
         return node;
-    })
+    });
 
     return {
         text: node.innerText,
         color: _.block(() => {
-            const mark = node.querySelector('mark')
-            if (_.isNull(mark)) return ''
-            return mark.style.backgroundColor
-        })
-    }
-}
+            const mark = node.querySelector('mark');
+            if (_.isNull(mark)) return '';
+            return mark.style.backgroundColor;
+        }),
+    };
+};
 
 export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<Thesis[]> => {
     const thesesRem = await getRems(
@@ -665,10 +668,10 @@ export interface Food {
 }
 
 export interface Ration {
-    readonly time: string;
-    readonly hungerBefore: SDK.Rem;
-    readonly hungerAfter: SDK.Rem;
-    readonly foods: Food[][];
+    readonly time?: string;
+    readonly hungerBefore?: SDK.Rem;
+    readonly hungerAfter?: SDK.Rem;
+    readonly snacks: Food[][];
 }
 
 const extractUnitFromString = (str: string): string => {
@@ -699,33 +702,31 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
         const timeRem = await getRems(plugin, rem, includesStringInRem(REM_TEXT_RATIONS_TIME)).then(
             _.first
         );
-        return richTextToString(plugin, timeRem?.backText);
+        if (_.isUndefined(timeRem)) return;
+        else return richTextToString(plugin, timeRem?.backText);
     });
 
     const listHungerBefore = await _.asyncMap(rationRems, async (rem) => {
-        return getRems(
-            plugin,
-            rem,
-            includesStringInRem(REM_TEXT_RATIONS_HUNGER_BEFORE)
-        ).then(_.first);
-    }).then(FP.filter(_.isNotUndefined));
+        return getRems(plugin, rem, includesStringInRem(REM_TEXT_RATIONS_HUNGER_BEFORE)).then(
+            _.first
+        );
+    });
 
     const listHungerAfter = await _.asyncMap(rationRems, async (rem) => {
-        return getRems(
-            plugin,
-            rem,
-            includesStringInRem(REM_TEXT_RATIONS_HUNGER_AFTER)
-        ).then(_.first);
-    }).then(FP.filter(_.isNotUndefined));
+        return getRems(plugin, rem, includesStringInRem(REM_TEXT_RATIONS_HUNGER_AFTER)).then(
+            _.first
+        );
+    });
 
-    const listFoods = await _.asyncMap(rationRems, async (rem) => {
+    const snacks = await _.asyncMap(rationRems, async (rem) => {
         const foodRems = await getRems(plugin, rem, async (__, rem) => {
             const includes = (str: string) => includesStringInRem(str)(plugin, rem);
             if (await rem.isPowerupProperty()) return false;
-            if (await includes(REM_TEXT_RATIONS_TIME)) return false;
-            if (await includes(REM_TEXT_RATIONS_HUNGER_BEFORE)) return false;
-            if (await includes(REM_TEXT_RATIONS_HUNGER_AFTER)) return false;
-            return true;
+            else if (await includes(REM_TEXT_RATIONS_TIME)) return false;
+            else if (await includes(REM_TEXT_RATIONS_HUNGER_BEFORE)) return false;
+            else if (await includes(REM_TEXT_RATIONS_HUNGER_AFTER)) return false;
+            else if (_.isEmpty(_.trim(await richTextToString(plugin, rem.text)))) return false;
+            else return true;
         });
 
         const rawFoods = await _.asyncMap(foodRems, async (rem) => {
@@ -762,9 +763,9 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
         times,
         listHungerBefore,
         listHungerAfter,
-        listFoods,
-        (time, hungerBefore, hungerAfter, foods) => {
-            return { time, hungerBefore, hungerAfter, foods };
+        snacks,
+        (time, hungerBefore, hungerAfter, snacks) => {
+            return { time, hungerBefore, hungerAfter, snacks };
         }
     );
 };
@@ -785,7 +786,7 @@ const compareInaccurately = (str1: string, str2: string) => distance(str1, str2)
 export type Nutrition = Record<string, Product[]>;
 
 export const nutrition = async (plugin: SDK.RNPlugin, rations: Ration[]): Promise<Nutrition> => {
-    const allFoods = _.flatten(rations.flatMap(({ foods }) => foods));
+    const allFoods = _.flatten(rations.flatMap(({ snacks }) => snacks));
     const allProductRems = _.uniqBy(
         _.flatMap(allFoods, ({ productRems }) => productRems),
         ({ _id }) => _id
@@ -943,8 +944,8 @@ const expandProductEnvironment = async (
             plugin,
             dailyRem,
             includesStringInRem(REM_TEXT_PRODUCTS)
-        ).then(_.head)
-        if (_.isNotUndefined(productsRem)) return productsRem
+        ).then(_.head);
+        if (_.isNotUndefined(productsRem)) return productsRem;
 
         const rem = await plugin.rem.createRem();
         await rem?.setParent(dailyRem);
@@ -986,10 +987,7 @@ const collapseProductEnvironment = async (
     await forPortalRem?.remove();
 };
 
-export const addPortalProduct = async (
-    plugin: SDK.RNPlugin,
-    dailyRem: SDK.Rem
-): Promise<void> => {
+export const addPortalProduct = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<void> => {
     const docName = await richTextToString(plugin, dailyRem.text);
     const docDate = convertOrdinalDateToDate(docName);
     if (_.isUndefined(docDate)) return;
@@ -1022,12 +1020,12 @@ export const addPortalProduct = async (
         dailyRem,
         includesStringInRem(REM_TEXT_RATIONS),
         includesStringInRem(REM_TEXT_NEW)
-    ).then(_.head)
-    if (_.isUndefined(newRem)) return void toast('Rem "Новое" не найден')
+    ).then(_.head);
+    if (_.isUndefined(newRem)) return void toast('Rem "Новое" не найден');
 
     const portal = await plugin.rem.createPortal();
-    if (_.isUndefined(portal)) return void toast('Портал почему-то не создан')
+    if (_.isUndefined(portal)) return void toast('Портал почему-то не создан');
 
     await portal?.setParent(newRem);
-    await forPortalRem.addToPortal(portal)
+    await forPortalRem.addToPortal(portal);
 };

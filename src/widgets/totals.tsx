@@ -4,6 +4,7 @@ import { SymptomPanel } from '../components/SymptomPanel';
 import { RegimePanel } from '../components/RegimePanel';
 import { PomodoroPanel } from '../components/PomodoPanel';
 import { RitualPanel } from '../components/RitualPanel';
+import { RationPanel } from '../components/RationPanel';
 
 function useDateFilter() {
     const [selectedYear, setSelectedYear] = SDK.useSessionStorageState(
@@ -76,7 +77,7 @@ function Totals() {
         }, [plugin, selectedYear, selectedMonth, selectedSprint]) ?? [];
 
     return (
-        <div className="overflow-y-scroll px-2">
+        <div className="px-2">
             <form className="grid grid-cols-2 gap-x-8 gap-y-4">
                 <div className="flex flex-col gap-y-2">
                     <label htmlFor="years" className="text-sm font-medium">
@@ -169,6 +170,8 @@ function Totals() {
                     <PomodoroPanel dailyDocs={dailyDocs} />
                 ) : type.isRituals() ? (
                     <RitualPanel dailyDocs={dailyDocs} />
+                ) : type.isRations() ? (
+                    <RationPanel dailyDocs={dailyDocs} />
                 ) : null}
             </div>
         </div>
