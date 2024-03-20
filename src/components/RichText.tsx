@@ -79,7 +79,6 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
 
         const handleClickOnAnchor = _.memoize((remId: string) => async () => {
             const rem = await plugin.rem.findOne(remId);
-            handleClickOnAnchor(remId);
             if (_.isUndefined(rem)) return;
             await rem.openRemAsPage();
         });
