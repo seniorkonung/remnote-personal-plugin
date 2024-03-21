@@ -5,6 +5,7 @@ import { RegimePanel } from '../components/RegimePanel';
 import { PomodoroPanel } from '../components/PomodoPanel';
 import { RitualPanel } from '../components/RitualPanel';
 import { RationPanel } from '../components/RationPanel';
+import { NutritionPanel } from '../components/NutritionPanel';
 
 function Totals() {
     const plugin = SDK.usePlugin();
@@ -97,12 +98,12 @@ function Totals() {
                         className="border text-sm rounded-lg p-2"
                     >
                         <option value={App.TYPES.MAIN}>{App.TYPES.MAIN}</option>
-                        <option value={App.TYPES.NUTRITION}>{App.TYPES.NUTRITION}</option>
-                        <option value={App.TYPES.POMODORO}>{App.TYPES.POMODORO}</option>
-                        <option value={App.TYPES.RATIONS}>{App.TYPES.RATIONS}</option>
-                        <option value={App.TYPES.SYMPTOMS}>{App.TYPES.SYMPTOMS}</option>
                         <option value={App.TYPES.REGIME}>{App.TYPES.REGIME}</option>
                         <option value={App.TYPES.RITUALS}>{App.TYPES.RITUALS}</option>
+                        <option value={App.TYPES.SYMPTOMS}>{App.TYPES.SYMPTOMS}</option>
+                        <option value={App.TYPES.POMODORO}>{App.TYPES.POMODORO}</option>
+                        <option value={App.TYPES.NUTRITION}>{App.TYPES.NUTRITION}</option>
+                        <option value={App.TYPES.RATIONS}>{App.TYPES.RATIONS}</option>
                         <option value={App.TYPES.OTHER}>{App.TYPES.OTHER}</option>
                     </select>
                 </div>
@@ -119,6 +120,8 @@ function Totals() {
                     <RitualPanel dailyDocs={dailyDocs} />
                 ) : type.isRations() ? (
                     <RationPanel dailyDocs={dailyDocs} />
+                ) : type.isNutrition() ? (
+                    <NutritionPanel dailyDocs={dailyDocs} />
                 ) : null}
             </div>
         </div>

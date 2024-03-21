@@ -26,12 +26,7 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
             .uniq()
             .sort()
             .map((category, i, categories) => {
-                const name = _.block(() => {
-                    const isEmptyCategory = _.isEmpty(category.trim());
-                    if (isEmptyCategory) return 'Без категории';
-                    else return category;
-                });
-
+                const name = _.isEmpty(category.trim()) ? 'Без категории' : category;
                 const delimiter = _.block(() => {
                     const isLastCategory = i === categories.length - 1;
                     if (isLastCategory) return '.';
@@ -50,8 +45,8 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
 
         return (
             <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
-                <p className="flex flex-wrap gap-1 mb-6">{categories}</p>
-                <ol className="grid gap-3">
+                <p className="flex flex-wrap gap-1">{categories}</p>
+                <ol className="grid gap-3 mt-6">
                     {rations.map((ration) => {
                         return <Ration ration={ration} />;
                     })}

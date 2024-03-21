@@ -197,7 +197,7 @@ export const richTextToHtml = async (
     plugin: SDK.RNPlugin,
     richText?: SDK.RichTextInterface
 ): Promise<string> => {
-    const ids = await plugin.richText.deepGetRemIdsFromRichText(richText ?? []);
+    const ids = await plugin.richText.getRemIdsFromRichText(richText ?? []);
     await _.asyncMap(ids, plugin.rem.findOne);
     return await plugin.richText.toHTML(richText ?? []);
 };
@@ -448,7 +448,7 @@ const getRemObjectsFromRichText = async (
     richText?: SDK.RichTextInterface
 ): Promise<(SDK.Rem | undefined)[]> => {
     return _.asyncMap(
-        await plugin.richText.deepGetRemIdsFromRichText(richText ?? []),
+        await plugin.richText.getRemIdsFromRichText(richText ?? []),
         plugin.rem.findOne
     );
 };
@@ -680,12 +680,16 @@ const extractUnitFromString = (str: string): string => {
     return str.replace(/.+?([A-zА-я]+)/, '$1');
 };
 
+const roundToHundredths = (num: number): number => {
+    return _.floor(num * 100) / 100;
+};
+
 const extractPortionFromString = (str: string): number => {
     const d = str.match(/\d+/g)?.map(_.toNumber);
     if (!d) return 0;
     else if (d.length === 1) return d[0];
-    else if (d.length === 2) return _.floor((d[0] / d[1]) * 100) / 100;
-    else if (d.length === 3) return _.floor((d[0] + d[1] / d[2]) * 100) / 100;
+    else if (d.length === 2) return roundToHundredths(d[0] / d[1]);
+    else if (d.length === 3) return roundToHundredths(d[0] + d[1] / d[2]);
     else return 0;
 };
 
@@ -772,31 +776,38 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
     );
 };
 
-interface ProductTotal {
+interface NutritionProductTotal {
     readonly eaten: number;
     readonly unit: string;
 }
 
-interface Product {
-    readonly totals: ProductTotal[];
+interface NutritionProduct {
+    readonly rem: SDK.Rem;
+    readonly totals: NutritionProductTotal[];
     readonly categories: string[];
     readonly foods: Food[];
 }
 
 const compareInaccurately = (str1: string, str2: string) => distance(str1, str2) > 0.75;
 
-export type Nutrition = Record<string, Product[]>;
+export interface NutritionCategory {
+    category: string;
+    products: NutritionProduct[];
+}
 
-export const nutrition = async (plugin: SDK.RNPlugin, rations: Ration[]): Promise<Nutrition> => {
+export const nutrition = async (
+    plugin: SDK.RNPlugin,
+    rations: Ration[]
+): Promise<NutritionCategory[]> => {
     const allFoods = _.flatten(rations.flatMap(({ snacks }) => snacks));
     const allProductRems = _.uniqBy(
         _.flatMap(allFoods, ({ productRems }) => productRems),
         ({ _id }) => _id
     );
 
-    const products = await _.asyncMap(allProductRems, async (rem) => {
+    const products = await _.asyncMap(allProductRems, async (productRem) => {
         const foodsByProductId = allFoods.filter(({ productRems }) => {
-            return _.find(productRems, { _id: rem._id });
+            return _.find(productRems, { _id: productRem._id });
         });
 
         const units = _.uniqWith(
@@ -811,32 +822,32 @@ export const nutrition = async (plugin: SDK.RNPlugin, rations: Ration[]): Promis
         });
 
         return {
+            rem: productRem,
             foods: foodsByProductId,
             totals: foodsByUnits.map((foods) => {
                 return _.reduce(
                     foods,
                     (result, food) => {
                         return {
-                            eaten: result.eaten + food.portion,
-                            unit: food.unit.slice(0, 3) + '.',
+                            eaten: roundToHundredths(result.eaten + food.portion),
+                            unit: food.unit,
                         };
                     },
                     {
                         eaten: 0,
                         unit: '',
-                    } as ProductTotal
+                    }
                 );
             }),
             categories: await _.block(async () => {
                 const categoryRem = await getRems(
                     plugin,
-                    rem,
+                    productRem,
                     includesStringInRem(REM_TEXT_CATEGORIES)
                 ).then(_.first);
-
-                return (await richTextToString(plugin, categoryRem?.backText)).split(',');
+                return _.split(await richTextToString(plugin, categoryRem?.backText), ',');
             }),
-        } as Product;
+        };
     });
 
     const allCategories = _.uniq(allFoods.flatMap(({ categories }) => categories));
@@ -846,7 +857,14 @@ export const nutrition = async (plugin: SDK.RNPlugin, rations: Ration[]): Promis
         });
     });
 
-    return _.zipObject(allCategories, productsByCategories);
+    const nutritionCategories = _.zipWith(
+        allCategories,
+        productsByCategories,
+        (category, products) => {
+            return { category, products };
+        }
+    );
+    return _.sortBy(nutritionCategories, ['category']);
 };
 
 export const incrementRitualFlashcards = async (plugin: SDK.RNPlugin): Promise<void> => {
@@ -893,6 +911,10 @@ export const findDailyDocInAncestors = async (rem: SDK.Rem): Promise<SDK.Rem | u
     else return findDailyDocInAncestors(parentRem);
 };
 
+const roundToTens = (num: number): number => {
+    return _.round(num * 10) / 10;
+};
+
 export const calculateAndSetQuota = async (
     plugin: SDK.RNPlugin,
     dailyRem: SDK.Rem
@@ -923,7 +945,7 @@ export const calculateAndSetQuota = async (
         [0, 0] as [number, number]
     );
 
-    const quota = goodSumPom / QUOTA_FACTOR - badSumPom + prevQuota;
+    const quota = roundToTens(goodSumPom / QUOTA_FACTOR - badSumPom + prevQuota);
     const quotaRem = await getQuotaRem(dailyRem);
     quotaRem?.setBackText([_.toString(quota)]);
 };

@@ -18,9 +18,11 @@ export function Ration({ ration }: RationProps) {
             return (
                 <li key={food.rem._id}>
                     <div className="flex gap-1.5">
-                        <RichText richText={food.rem.text} defaultValue="-" />
+                        <span className="font-semibold">
+                            <RichText richText={food.rem.text} defaultValue="-" />
+                        </span>
                         <span>—</span>
-                        <span>
+                        <span className="italic" style={{ letterSpacing: '0.025em' }}>
                             <span className="font-bold">{food.portion}</span>{' '}
                             <span style={{ opacity: '.75' }}>{food.unit}</span>
                         </span>
@@ -31,7 +33,7 @@ export function Ration({ ration }: RationProps) {
 
     return (
         <li>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 font-medium">
                 <span>
                     <span>🕰️ </span>
                     <span className="italic" style={{ letterSpacing: '0.025em' }}>

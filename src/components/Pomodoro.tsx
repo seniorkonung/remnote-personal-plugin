@@ -18,9 +18,9 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
 
             {isTotal ? (
                 <p
-                    className="font-medium my-2 my-1 px-2 py-1 rounded-md"
+                    className="font-semibold my-2 my-1 px-2 py-1 rounded-md"
                     style={{
-                        letterSpacing: '0.01em',
+                        letterSpacing: '0.025em',
                         color: 'white',
                         backgroundColor: 'blue',
                     }}
@@ -29,9 +29,9 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
                 </p>
             ) : (
                 <p
-                    className="font-medium my-2"
+                    className="font-semibold my-2"
                     style={{
-                        letterSpacing: '0.01em',
+                        letterSpacing: '0.025em',
                     }}
                 >
                     {pomodoro.name}
