@@ -8,7 +8,9 @@ interface SymptomProps {
 export function Symptom({ symptom }: SymptomProps) {
     return (
         <li>
-            <RichText richText={symptom.rem.text} />
+            <span className="font-medium">
+                <RichText richText={symptom.rem.text} />
+            </span>
             <ul>
                 {symptom.notes.map((note) => {
                     return (
