@@ -12,7 +12,7 @@ export function SymptomPanel({ dailyDocs }: SymptomPanelProps) {
     const plugin = SDK.usePlugin();
 
     const dailyDocsAndSymptoms =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
                 const symptoms = await App.symptoms(plugin, dailyDoc.rem);
                 return { dailyDoc, symptoms };

@@ -12,7 +12,7 @@ export function RitualPanel({ dailyDocs }: RitualPanelProps) {
     const plugin = SDK.usePlugin();
 
     const dailyDocsAndRituals =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
                 const rituals = await App.rituals(plugin, dailyDoc.rem);
                 return { dailyDoc, rituals };

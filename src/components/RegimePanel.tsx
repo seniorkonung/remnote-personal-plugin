@@ -12,7 +12,7 @@ export function RegimePanel({ dailyDocs }: RegimePanelProps) {
     const plugin = SDK.usePlugin();
 
     const dailyDocsAndRegime =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
                 const regime = await App.regime(plugin, dailyDoc.rem);
                 return { dailyDoc, regime };

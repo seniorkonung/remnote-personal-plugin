@@ -13,7 +13,7 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
     const spanRef = React.useRef<HTMLSpanElement>(null);
 
     const html =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             if (_.isUndefined(richText)) return '';
             const html = await App.richTextToHtml(plugin, richText);
             const remsInfo = await _.asyncMap(

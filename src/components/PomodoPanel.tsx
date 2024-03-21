@@ -31,7 +31,7 @@ export function PomodoroPanel({ dailyDocs }: PomodoroPanelProps) {
     const plugin = SDK.usePlugin();
 
     const dailyDocsAndPomodoros =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
                 const pomodoros = await App.pomodoros(plugin, dailyDoc.rem);
                 return { dailyDoc, pomodoros };

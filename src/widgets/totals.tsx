@@ -6,59 +6,6 @@ import { PomodoroPanel } from '../components/PomodoPanel';
 import { RitualPanel } from '../components/RitualPanel';
 import { RationPanel } from '../components/RationPanel';
 
-function useDateFilter() {
-    const [selectedYear, setSelectedYear] = SDK.useSessionStorageState(
-        'selected_year',
-        App.years()[0]
-    );
-    const [selectedMonth, setSelectedMonth] = SDK.useSessionStorageState(
-        'selected_month',
-        App.months(selectedYear)[0]
-    );
-    const [selectedSprint, setSelectedSprint] = SDK.useSessionStorageState(
-        'selected_sprint',
-        App.sprints(selectedYear, selectedMonth)[0]
-    );
-    return {
-        selectedYear,
-        selectedMonth,
-        selectedSprint,
-        setSelectedYear(year: number) {
-            const month = App.months(year)[0];
-            const sprint = App.sprints(year, month)[0];
-            setSelectedYear(year);
-            setSelectedMonth(month);
-            setSelectedSprint(sprint);
-        },
-        setSelectedMonth(month: string) {
-            const year = selectedYear;
-            const sprint = App.sprints(year, month)[0];
-            setSelectedMonth(month);
-            setSelectedSprint(sprint);
-        },
-        setSelectedSprint,
-    };
-}
-
-function useFilterType() {
-    const [selectedType, setSelectedType] = SDK.useSessionStorageState(
-        'selected_type',
-        App.TYPES.MAIN
-    );
-    return {
-        isMain: () => selectedType === App.TYPES.MAIN,
-        isNutrition: () => selectedType === App.TYPES.NUTRITION,
-        isPomodoro: () => selectedType === App.TYPES.POMODORO,
-        isRations: () => selectedType === App.TYPES.RATIONS,
-        isSymptoms: () => selectedType === App.TYPES.SYMPTOMS,
-        isRegime: () => selectedType === App.TYPES.REGIME,
-        isRituals: () => selectedType === App.TYPES.RITUALS,
-        isOther: () => selectedType === App.TYPES.OTHER,
-        selectedType,
-        setSelectedType,
-    };
-}
-
 function Totals() {
     const plugin = SDK.usePlugin();
     const {
@@ -68,11 +15,11 @@ function Totals() {
         setSelectedYear,
         setSelectedMonth,
         setSelectedSprint,
-    } = useDateFilter();
-    const type = useFilterType();
+    } = App.Hooks.useDateFilter();
+    const type = App.Hooks.useFilterType();
 
     const dailyDocs =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             return App.dailyDocs(plugin, selectedYear, selectedMonth, selectedSprint);
         }, [plugin, selectedYear, selectedMonth, selectedSprint]) ?? [];
 

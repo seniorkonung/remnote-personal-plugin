@@ -12,7 +12,7 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
     const plugin = SDK.usePlugin();
 
     const dailyDocsAndRations =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
                 const rations = await App.rations(plugin, dailyDoc.rem);
                 return { dailyDoc, rations };

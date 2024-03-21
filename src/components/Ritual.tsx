@@ -10,11 +10,11 @@ interface RitualProps {
 export function Ritual({ ritual }: RitualProps) {
     const plugin = SDK.usePlugin();
     const name =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             return App.richTextToString(plugin, ritual.rem.text).then(_.trim);
         }, [plugin, ritual]) ?? '';
     const value =
-        SDK.useRunAsync(async () => {
+        App.Hooks.useRunAsync(async () => {
             return App.richTextToHtml(plugin, ritual.rem.backText).then(_.trim);
         }, [plugin, ritual]) ?? '';
 

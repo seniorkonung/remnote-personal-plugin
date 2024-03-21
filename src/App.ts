@@ -3,6 +3,8 @@ import FP from 'lodash/fp';
 import * as SDK from '@remnote/plugin-sdk';
 import distance from 'jaro-winkler';
 
+export * as Hooks from './Hooks';
+
 export const MONTHS = [
     'Январь',
     'Февраль',
