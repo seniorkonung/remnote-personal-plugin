@@ -9,13 +9,12 @@ interface RichTextProps {
 }
 
 export function RichText({ richText, defaultValue }: RichTextProps) {
-    if (_.isUndefined(richText)) return <span>{defaultValue}</span>;
-
     const plugin = SDK.usePlugin();
     const spanRef = React.useRef<HTMLSpanElement>(null);
 
     const html =
         SDK.useRunAsync(async () => {
+            if (_.isUndefined(richText)) return '';
             const html = await App.richTextToHtml(plugin, richText);
             const remsInfo = await _.asyncMap(
                 await plugin.richText.deepGetRemIdsFromRichText(richText),
@@ -98,6 +97,7 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
         };
     }, [html]);
 
-    if (_.isEmpty(html.trim())) return <span>{defaultValue}</span>;
+    if (_.isUndefined(richText)) return <span>{defaultValue}</span>;
+    else if (_.isEmpty(html.trim())) return <span>{defaultValue}</span>;
     else return <span ref={spanRef} dangerouslySetInnerHTML={{ __html: html }}></span>;
 }
