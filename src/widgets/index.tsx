@@ -3,7 +3,6 @@ import * as App from '../App';
 import _ from 'lodash';
 import '../styles/style.css';
 
-const NAVIGATION_POWERUP = 'navigation_powerup';
 const TOTALS_POWERUP = 'totals_powerup';
 
 const EventQueueCompleteCard = _.once((plugin: SDK.RNPlugin) => {
