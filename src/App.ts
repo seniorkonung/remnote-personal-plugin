@@ -97,7 +97,7 @@ export const sprints = (year: number, month: string): string[] => {
         .concat([ALL_SPRINT]);
 };
 
-const daysInSprint = (year: number, month: number, sprint: string): Date[] => {
+const daysOfSprint = (year: number, month: number, sprint: string): Date[] => {
     if (sprint === ALL_SPRINT) return Utils.daysOfMonth(year, month);
 
     const sprintNumber = _.toNumber(sprint.slice(0, 1));
@@ -173,7 +173,7 @@ export const dailyDocs = async (
     sprint: string
 ): Promise<DailyDoc[]> => {
     const dailyRems = await _.block(async () => {
-        const days = daysInSprint(year, MONTHS.indexOf(month), sprint).filter(
+        const days = daysOfSprint(year, MONTHS.indexOf(month), sprint).filter(
             Utils.isNotFutureDate
         );
         const rems = await _.asyncMap(days, async (day) => getDailyDoc(plugin, day));
