@@ -680,7 +680,7 @@ export const removeEmptyChildProperties = async (
         const value = backText.trim();
 
         if (value === 'No') return true;
-        else if (_.isEmpty(value.length)) return true;
+        else if (_.isEmpty(value)) return true;
         else return false;
     });
 
