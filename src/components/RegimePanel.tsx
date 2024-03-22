@@ -22,7 +22,9 @@ export function RegimePanel({ dailyDocs }: RegimePanelProps) {
     const days = dailyDocsAndRegime.map(({ dailyDoc, regime }) => {
         return (
             <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
-                <Regime regime={regime} />
+                <div className="px-2">
+                    <Regime regime={regime} />
+                </div>
             </Day>
         );
     });

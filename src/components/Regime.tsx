@@ -7,7 +7,7 @@ interface RegimeProps {
 
 export function Regime({ regime }: RegimeProps) {
     return (
-        <div className="grid grid-cols-2 px-2">
+        <div className="grid grid-cols-2">
             <div>
                 <p className="font-medium my-3">{App.REM_TEXT_START_DAY}:</p>
                 <p
