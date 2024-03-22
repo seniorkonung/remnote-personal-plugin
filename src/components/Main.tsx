@@ -46,7 +46,7 @@ export function Main(props: MainProps) {
                                     : thesis.isEvent
                                     ? '!'
                                     : thesis.isInfo
-                                    ? 'i'
+                                    ? '~'
                                     : '?'}
                             </span>
 
