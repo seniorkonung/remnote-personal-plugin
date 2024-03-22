@@ -16,6 +16,11 @@
   "requiredScopes": [
     {
       "type": "All",
+      "level": "Read"
+    },
+    {
+      "type": "Powerup",
+      "powerupCode": "d",
       "level": "ReadCreateModifyDelete"
     }
   ]
