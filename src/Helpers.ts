@@ -58,7 +58,7 @@ export const richTextToEmbeddedHtml = async (
 
         const icon = remsInfo.at(i)?.icon;
         if (_.isNotUndefined(icon)) {
-            a.innerHTML = `<span>${icon}</span>` + '&nbsp;&nbsp;' + a.innerHTML;
+            a.innerHTML = `<span>${icon}&nbsp;</span>` + a.innerHTML;
         }
 
         a.removeAttribute('href');
