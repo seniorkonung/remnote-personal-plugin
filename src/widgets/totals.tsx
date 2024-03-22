@@ -104,7 +104,6 @@ function Totals() {
                         <option value={App.TYPES.POMODORO}>{App.TYPES.POMODORO}</option>
                         <option value={App.TYPES.NUTRITION}>{App.TYPES.NUTRITION}</option>
                         <option value={App.TYPES.RATIONS}>{App.TYPES.RATIONS}</option>
-                        <option value={App.TYPES.OTHER}>{App.TYPES.OTHER}</option>
                     </select>
                 </div>
             </form>

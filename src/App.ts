@@ -28,7 +28,6 @@ export enum TYPES {
     SYMPTOMS = '🌡️ Симптомы',
     REGIME = '🛏️ Режим',
     RITUALS = '🛞 Ритуалы',
-    OTHER = '💬 Другое',
 }
 
 const STARTING_YEAR = 2023;

@@ -67,7 +67,6 @@ export function useFilterType() {
         isSymptoms: () => selectedType === App.TYPES.SYMPTOMS,
         isRegime: () => selectedType === App.TYPES.REGIME,
         isRituals: () => selectedType === App.TYPES.RITUALS,
-        isOther: () => selectedType === App.TYPES.OTHER,
         selectedType,
         setSelectedType,
     };
