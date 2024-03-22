@@ -6,6 +6,7 @@ import { PomodoroPanel } from '../components/PomodoPanel';
 import { RitualPanel } from '../components/RitualPanel';
 import { RationPanel } from '../components/RationPanel';
 import { NutritionPanel } from '../components/NutritionPanel';
+import { MainPanel } from '../components/MainPanel';
 
 function Totals() {
     const plugin = SDK.usePlugin();
@@ -121,6 +122,8 @@ function Totals() {
                     <RationPanel dailyDocs={dailyDocs} />
                 ) : type.isNutrition() ? (
                     <NutritionPanel dailyDocs={dailyDocs} />
+                ) : type.isMain() ? (
+                    <MainPanel dailyDocs={dailyDocs} />
                 ) : null}
             </div>
         </div>

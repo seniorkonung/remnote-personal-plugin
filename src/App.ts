@@ -1,6 +1,7 @@
 import _, { LoDashStatic } from 'lodash';
 import FP from 'lodash/fp';
 import * as SDK from '@remnote/plugin-sdk';
+import * as Helpers from './Helpers';
 import distance from 'jaro-winkler';
 
 export * as Hooks from './Hooks';
@@ -537,22 +538,6 @@ export const daysUntilEndOfMonth = (dailyDocName: string): number => {
     return lastDay.getDate() - dateOfDay.getDate();
 };
 
-export const quota = async (
-    plugin: SDK.RNPlugin,
-    dailyRem: SDK.Rem
-): Promise<number | undefined> => {
-    const quotaRem = await getRems(
-        plugin,
-        dailyRem,
-        includesStringInRem(REM_TEXT_TOTALS),
-        includesStringInRem(REM_TEXT_OTHER),
-        includesStringInRem(REM_TEXT_QUOTA)
-    ).then(_.head);
-
-    if (_.isUndefined(quotaRem?.backText)) return;
-    else return _.toNumber(await richTextToString(plugin, quotaRem.backText));
-};
-
 export const notesCount = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<number> => {
     const notesRem = await getRems(plugin, dailyRem, includesStringInRem(REM_TEXT_NOTES)).then(
         _.head
@@ -570,11 +555,15 @@ const hasTagInRem: (tagName: string) => Filter = (tagName) => async (plugin, rem
     }).then(FP.includes(true));
 };
 
-const splitAndFormatTextInHtml = (
-    html: Node | string,
-    format: (text: string) => string | false,
-    ...separators: string[]
-): string[] => {
+const splitString = (text: string, separators: string[]): string[] => {
+    if (_.isEmpty(separators)) return [text];
+    const [separator, ...tailSeparators] = separators;
+    return text.split(separator).flatMap((text) => {
+        return splitString(text, tailSeparators);
+    });
+};
+
+const splitTextInHtml = (html: Node | string, ...separators: string[]): string[] => {
     const node = _.block(() => {
         if (_.isString(html) === false) return html;
         const node = document.createElement('div');
@@ -582,56 +571,40 @@ const splitAndFormatTextInHtml = (
         return node;
     });
 
-    const deepSplit = (text: string, separators: string[]): string[] => {
-        if (_.isEmpty(separators)) return [text];
-        const [separator, ...tailSeparators] = separators;
-        return text.split(separator).flatMap((text) => {
-            return deepSplit(text, tailSeparators);
-        });
-    };
-
     if (node.nodeType === node.TEXT_NODE) {
-        return deepSplit(node.textContent ?? '', separators)
-            .map(format)
-            .filter((text): text is string => text !== false)
-            .map((text) => {
-                if (_.isNull(node?.parentNode?.parentNode)) return text;
+        return splitString(node.textContent ?? '', separators).map((text) => {
+            if (_.isNull(node?.parentNode?.parentNode)) return text;
 
-                const cloneNode = node.parentNode.cloneNode();
-                if ('innerText' in cloneNode === false) return text;
-                if ('outerHTML' in cloneNode === false) return text;
+            const cloneNode = node.parentNode.cloneNode();
+            if ('innerText' in cloneNode === false) return text;
+            if ('outerHTML' in cloneNode === false) return text;
 
-                cloneNode.innerText = text;
-                return cloneNode.outerHTML as string;
-            });
-    } else {
-        return _.flatMap(node.childNodes, (node) => {
-            return splitAndFormatTextInHtml(node, format, ...separators);
+            cloneNode.innerText = text;
+            return cloneNode.outerHTML as string;
         });
+    } else {
+        return _.reduce(
+            node.childNodes,
+            (result, node) => {
+                const strings = splitTextInHtml(node, ...separators);
+                const head = _.head(strings) ?? '';
+                const tail = _.tail(strings);
+                const lastResult = _.last(result) ?? '';
+                return [...result.slice(0, -1), lastResult + head, ...tail];
+            },
+            [] as string[]
+        );
     }
 };
 
-interface Thesis {
-    readonly text: string;
+export interface Thesis {
+    readonly embeddedHtml: string;
     readonly color: string;
+    readonly isGood: boolean;
+    readonly isEvent: boolean;
+    readonly isBad: boolean;
+    readonly isInfo: boolean;
 }
-
-const extractThesisFromHtml = (html: string): Thesis => {
-    const node = _.block(() => {
-        const node = document.createElement('div');
-        node.innerHTML = html;
-        return node;
-    });
-
-    return {
-        text: node.innerText,
-        color: _.block(() => {
-            const mark = node.querySelector('mark');
-            if (_.isNull(mark)) return '';
-            return mark.style.backgroundColor;
-        }),
-    };
-};
 
 export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<Thesis[]> => {
     const thesesRem = await getRems(
@@ -641,15 +614,42 @@ export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<T
         hasTagInRem(REM_TEXT_THESIS)
     ).then(_.head);
 
-    return splitAndFormatTextInHtml(
-        await richTextToHtml(plugin, thesesRem?.text),
-        (text) => {
-            if (_.isEmpty(text.trim())) return false;
-            else return _.upperFirst(text.trim());
-        },
-        ',',
-        '.'
-    ).map(extractThesisFromHtml);
+    const extractThesisFromHtml = (html: string) => {
+        const node = _.block(() => {
+            const node = document.createElement('div');
+            node.innerHTML = html;
+            return node;
+        });
+
+        const marks = node.querySelectorAll('mark');
+        const color = _.block(() => {
+            const firstMark = _.first(
+                _.filter(marks, (mark) => {
+                    return _.isEmpty(mark.innerText.trim()) === false;
+                })
+            );
+            if (_.isUndefined(firstMark)) return '';
+            return firstMark.style.backgroundColor;
+        });
+
+        _.forEach(marks, (mark) => {
+            mark.outerHTML = mark.innerText;
+        });
+
+        return {
+            color,
+            embeddedHtml: node.innerHTML,
+            text: node.innerText.trim(),
+            isGood: ['yellow', 'green'].includes(color),
+            isEvent: ['blue', 'purple'].includes(color),
+            isBad: ['red', 'orange'].includes(color),
+            isInfo: _.isEmpty(color),
+        };
+    };
+
+    return splitTextInHtml(await Helpers.richTextToEmbeddedHtml(plugin, thesesRem?.text), '.')
+        .map(extractThesisFromHtml)
+        .filter(({ text }) => _.isEmpty(text) === false);
 };
 
 const splitArray = <T>(arr: T[], isDelimiter: (i: T) => boolean): T[][] => {
