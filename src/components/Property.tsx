@@ -12,11 +12,11 @@ export function Property({ text, backText }: PropertyProps) {
     const plugin = SDK.usePlugin();
     const name =
         App.Hooks.useRunAsync(async () => {
-            return App.richTextToString(plugin, text).then(_.trim);
+            return App.Helpers.richTextToString(plugin, text).then(_.trim);
         }, [plugin, text]) ?? '';
     const value =
         App.Hooks.useRunAsync(async () => {
-            return App.richTextToHtml(plugin, backText).then(_.trim);
+            return App.Helpers.richTextToHtml(plugin, backText).then(_.trim);
         }, [plugin, backText]) ?? '';
 
     const isNumber = _.isEmpty(value) ? false : _.isFinite(_.toNumber(value));
