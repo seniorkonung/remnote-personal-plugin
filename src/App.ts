@@ -1,10 +1,11 @@
-import _, { LoDashStatic } from 'lodash';
+import _ from 'lodash';
 import FP from 'lodash/fp';
 import * as SDK from '@remnote/plugin-sdk';
 import * as Helpers from './Helpers';
-import distance from 'jaro-winkler';
+import * as Utils from './Utils';
 
 export * as Hooks from './Hooks';
+export * as Utils from './Utils';
 
 export const MONTHS = [
     'Январь',
@@ -65,28 +66,6 @@ export const REM_TEXT_RATIONS_TIME = 'Время до';
 export const REM_TEXT_RATIONS_HUNGER_BEFORE = 'Состояние до';
 export const REM_TEXT_RATIONS_HUNGER_AFTER = 'Состояние после';
 
-declare module 'lodash' {
-    interface LoDashStatic {
-        block<T>(fn: () => T): T;
-        asyncMap<T1, T2>(
-            arr: T1[],
-            callbackFn: (v: T1, i: number, arr: T1[]) => Promise<T2>
-        ): Promise<T2[]>;
-        isNotUndefined<T>(v?: T): v is T;
-    }
-}
-_.mixin({
-    block(fn) {
-        return fn();
-    },
-    asyncMap(arr, callbackFn) {
-        return Promise.all(arr.map(callbackFn));
-    },
-    isNotUndefined(v) {
-        return v !== undefined;
-    },
-} as Pick<LoDashStatic, 'block' | 'asyncMap' | 'isNotUndefined'>);
-
 export const log = (...args: any[]): void => {
     console.log('%cApp(%d): ', 'color: yellow', Date.now() / 1000, ...args);
 };
@@ -102,11 +81,6 @@ export const months = (year: number): string[] => {
     else return FP.reverse(MONTHS);
 };
 
-const firstSunday = (date: Date): Date => {
-    if (date.getDay() === 0) return date;
-    else return new Date(date.getFullYear(), date.getMonth(), date.getDate() + (7 - date.getDay()));
-};
-
 export const sprints = (year: number, month: string): string[] => {
     const indexMonth = MONTHS.indexOf(month);
     const now = new Date();
@@ -118,7 +92,7 @@ export const sprints = (year: number, month: string): string[] => {
     });
 
     const numbers = _.times(
-        _.ceil((lastDay.getDate() - firstSunday(firstDay).getDate()) / 7) + 1,
+        _.ceil((lastDay.getDate() - Utils.firstSunday(firstDay).getDate()) / 7) + 1,
         FP.add(1)
     );
     return numbers
@@ -127,24 +101,20 @@ export const sprints = (year: number, month: string): string[] => {
         .concat([ALL_SPRINT]);
 };
 
-const daysInMonth = (year: number, month: number): Date[] => {
-    return _.times(new Date(year, month + 1, 0).getDate(), (t) => new Date(year, month, t + 1));
-};
-
 const daysInSprint = (year: number, month: number, sprint: string): Date[] => {
-    if (sprint === ALL_SPRINT) return daysInMonth(year, month);
+    if (sprint === ALL_SPRINT) return Utils.daysOfMonth(year, month);
 
     const sprintNumber = _.toNumber(sprint.slice(0, 1));
     const firstDayMonth = new Date(year, month, 1);
     const lastDayMonth = new Date(year, month + 1, 0);
 
-    const firstDateSprint = firstSunday(firstDayMonth).getDate() + (sprintNumber - 1) * 7 - 6;
+    const firstDateSprint = Utils.firstSunday(firstDayMonth).getDate() + (sprintNumber - 1) * 7 - 6;
     const firstDaySprint = _.block(() => {
         if (sprintNumber === 1) return firstDayMonth;
         else return new Date(year, month, firstDateSprint);
     });
 
-    const lastDateSprint = firstSunday(firstDayMonth).getDate() + (sprintNumber - 1) * 7;
+    const lastDateSprint = Utils.firstSunday(firstDayMonth).getDate() + (sprintNumber - 1) * 7;
     const lastDaySprint = _.block(() => {
         if (lastDateSprint >= lastDayMonth.getDate()) return lastDayMonth;
         else return new Date(year, month, lastDateSprint);
@@ -161,36 +131,6 @@ const daysInSprint = (year: number, month: number, sprint: string): Date[] => {
                 lastDaySprint,
             ];
     });
-};
-
-const isNotFuture = (date: Date): boolean => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const day = date.getDate();
-
-    const now = new Date();
-    const yearNow = now.getFullYear();
-    const monthNow = now.getMonth();
-    const dayNow = now.getDate();
-
-    if (yearNow < year) return false;
-    else if (yearNow === year && monthNow < month) return false;
-    else if (yearNow === year && monthNow === month && dayNow < day) return false;
-    else return true;
-};
-
-export const formatDateWithOrdinal = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = date.toLocaleString('en-US', { month: 'long' });
-    const day = date.getDate();
-
-    const nth = (num: number) => {
-        const suffixes = ['th', 'st', 'nd', 'rd'];
-        if (num > 0) return suffixes[(num > 3 && num < 21) || num % 10 > 3 ? 0 : num % 10];
-        else return '';
-    };
-
-    return `${month} ${day}${nth(day)}, ${year}`;
 };
 
 export const richTextToHtml = async (
@@ -227,7 +167,7 @@ const getDailyDoc = async (plugin: SDK.RNPlugin, day: Date): Promise<SDK.Rem | u
     const dailyPowerup = await plugin.powerup.getPowerupByCode(
         SDK.BuiltInPowerupCodes.DailyDocument
     );
-    return plugin.rem.findByName([formatDateWithOrdinal(day)], dailyPowerup?._id ?? null);
+    return plugin.rem.findByName([Utils.formatDateWithOrdinal(day)], dailyPowerup?._id ?? null);
 };
 
 export const dailyDocs = async (
@@ -237,7 +177,9 @@ export const dailyDocs = async (
     sprint: string
 ): Promise<DailyDoc[]> => {
     const dailyRems = await _.block(async () => {
-        const days = daysInSprint(year, MONTHS.indexOf(month), sprint).filter(isNotFuture);
+        const days = daysInSprint(year, MONTHS.indexOf(month), sprint).filter(
+            Utils.isNotFutureDate
+        );
         const rems = await _.asyncMap(days, async (day) => getDailyDoc(plugin, day));
         return rems.filter(_.isNotUndefined);
     });
@@ -329,31 +271,12 @@ export interface Regime {
     readonly sleepTime: string;
 }
 
-const parseMilitaryTimeToMinute = (time: string): number | undefined => {
-    const hourAndMinute = time.split(':').map(_.trim).map(_.toNumber);
-    if (_.isUndefined(hourAndMinute.at(0)) || _.isUndefined(hourAndMinute.at(1))) return;
-    else return hourAndMinute[0] * 60 + hourAndMinute[1];
-};
-
-const parseMinuteToMilitaryTime = (time: number): string => {
-    const hour = Math.floor(time / 60);
-    const minute = time % 60;
-    return `${hour < 10 ? `0${hour}` : hour}:${minute < 10 ? `0${minute}` : minute}`;
-};
-
-const convertOrdinalDateToDate = (ordinalDate: string): Date | undefined => {
-    const formatDate = /(\w+)\s(\d\d?)\w\w,\s(\d{4})/;
-    if (formatDate.test(ordinalDate) === false) return;
-    const formattedDate = ordinalDate.replace(formatDate, '$1 $2, $3');
-    return new Date(formattedDate);
-};
-
 const prevDailyDoc = async (
     plugin: SDK.RNPlugin,
     dailyRem: SDK.Rem
 ): Promise<SDK.Rem | undefined> => {
     const dailyDocName = await richTextToString(plugin, dailyRem.text);
-    const dateOfDay = convertOrdinalDateToDate(dailyDocName);
+    const dateOfDay = Utils.convertOrdinalDateToDate(dailyDocName);
     if (_.isUndefined(dateOfDay)) return;
 
     const dateOfPrevDay = new Date(
@@ -365,16 +288,20 @@ const prevDailyDoc = async (
         SDK.BuiltInPowerupCodes.DailyDocument
     );
 
-    return plugin.rem.findByName([formatDateWithOrdinal(dateOfPrevDay)], dailyPowerup?._id ?? null);
+    return plugin.rem.findByName(
+        [Utils.formatDateWithOrdinal(dateOfPrevDay)],
+        dailyPowerup?._id ?? null
+    );
 };
 
 const wakingTime = (startMinute: number, endMinute: number) => {
-    if (startMinute <= endMinute) return parseMinuteToMilitaryTime(endMinute - startMinute);
-    else return parseMinuteToMilitaryTime(24 * 60 - startMinute + endMinute);
+    if (startMinute <= endMinute) return Utils.parseMinuteToMilitaryTime(endMinute - startMinute);
+    else return Utils.parseMinuteToMilitaryTime(24 * 60 - startMinute + endMinute);
 };
 const sleepTime = (startMinute: number, prevEndMinute: number) => {
-    if (startMinute >= prevEndMinute) return parseMinuteToMilitaryTime(startMinute - prevEndMinute);
-    else return parseMinuteToMilitaryTime(startMinute + (24 * 60 - prevEndMinute));
+    if (startMinute >= prevEndMinute)
+        return Utils.parseMinuteToMilitaryTime(startMinute - prevEndMinute);
+    else return Utils.parseMinuteToMilitaryTime(startMinute + (24 * 60 - prevEndMinute));
 };
 
 export const regime = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<Regime> => {
@@ -409,13 +336,13 @@ export const regime = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<R
         else return getOneRemInRegime(prevDayRem, includesStringInRem(REM_TEXT_END_DAY));
     });
 
-    const startDayMinute = parseMilitaryTimeToMinute(
+    const startDayMinute = Utils.parseMilitaryTimeToMinute(
         await richTextToString(plugin, startDayRem?.backText)
     );
-    const endDayMinute = parseMilitaryTimeToMinute(
+    const endDayMinute = Utils.parseMilitaryTimeToMinute(
         await richTextToString(plugin, endDayRem?.backText)
     );
-    const prevEndDayMinute = parseMilitaryTimeToMinute(
+    const prevEndDayMinute = Utils.parseMilitaryTimeToMinute(
         await richTextToString(plugin, prevEndDayRem?.backText)
     );
 
@@ -525,14 +452,14 @@ export const others = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<O
 };
 
 export const version = (dailyDocName: string): number => {
-    const dateOfDay = convertOrdinalDateToDate(dailyDocName);
+    const dateOfDay = Utils.convertOrdinalDateToDate(dailyDocName);
     if (_.isUndefined(dateOfDay)) return -1;
     const msInDay = 1000 * 60 * 60 * 24;
     return _.ceil((dateOfDay.getTime() - VERSION_START_DAY.getTime()) / msInDay) + 1;
 };
 
 export const daysUntilEndOfMonth = (dailyDocName: string): number => {
-    const dateOfDay = convertOrdinalDateToDate(dailyDocName);
+    const dateOfDay = Utils.convertOrdinalDateToDate(dailyDocName);
     if (_.isUndefined(dateOfDay)) return -1;
     const lastDay = new Date(dateOfDay.getFullYear(), dateOfDay.getMonth() + 1, 0);
     return lastDay.getDate() - dateOfDay.getDate();
@@ -553,48 +480,6 @@ const hasTagInRem: (tagName: string) => Filter = (tagName) => async (plugin, rem
         const name = await richTextToString(plugin, rem.text);
         return name.includes(tagName);
     }).then(FP.includes(true));
-};
-
-const splitString = (text: string, separators: string[]): string[] => {
-    if (_.isEmpty(separators)) return [text];
-    const [separator, ...tailSeparators] = separators;
-    return text.split(separator).flatMap((text) => {
-        return splitString(text, tailSeparators);
-    });
-};
-
-const splitTextInHtml = (html: Node | string, ...separators: string[]): string[] => {
-    const node = _.block(() => {
-        if (_.isString(html) === false) return html;
-        const node = document.createElement('div');
-        node.innerHTML = html;
-        return node;
-    });
-
-    if (node.nodeType === node.TEXT_NODE) {
-        return splitString(node.textContent ?? '', separators).map((text) => {
-            if (_.isNull(node?.parentNode?.parentNode)) return text;
-
-            const cloneNode = node.parentNode.cloneNode();
-            if ('innerText' in cloneNode === false) return text;
-            if ('outerHTML' in cloneNode === false) return text;
-
-            cloneNode.innerText = text;
-            return cloneNode.outerHTML as string;
-        });
-    } else {
-        return _.reduce(
-            node.childNodes,
-            (result, node) => {
-                const strings = splitTextInHtml(node, ...separators);
-                const head = _.head(strings) ?? '';
-                const tail = _.tail(strings);
-                const lastResult = _.last(result) ?? '';
-                return [...result.slice(0, -1), lastResult + head, ...tail];
-            },
-            [] as string[]
-        );
-    }
 };
 
 export interface Thesis {
@@ -647,17 +532,9 @@ export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<T
         };
     };
 
-    return splitTextInHtml(await Helpers.richTextToEmbeddedHtml(plugin, thesesRem?.text), '.')
+    return Utils.splitTextInHtml(await Helpers.richTextToEmbeddedHtml(plugin, thesesRem?.text), '.')
         .map(extractThesisFromHtml)
         .filter(({ text }) => _.isEmpty(text) === false);
-};
-
-const splitArray = <T>(arr: T[], isDelimiter: (i: T) => boolean): T[][] => {
-    return arr.reduce((result, item) => {
-        if (isDelimiter(item)) return [...result, []];
-        const lastArray = _.last(result) ?? [];
-        return result.slice(0, -1).concat([[...lastArray, item]]);
-    }, [] as T[][]);
 };
 
 export interface Food {
@@ -679,16 +556,12 @@ const extractUnitFromString = (str: string): string => {
     return str.replace(/.+?([A-zА-я]+)/, '$1');
 };
 
-const roundToHundredths = (num: number): number => {
-    return _.floor(num * 100) / 100;
-};
-
 const extractPortionFromString = (str: string): number => {
     const d = str.match(/\d+/g)?.map(_.toNumber);
     if (!d) return 0;
     else if (d.length === 1) return d[0];
-    else if (d.length === 2) return roundToHundredths(d[0] / d[1]);
-    else if (d.length === 3) return roundToHundredths(d[0] + d[1] / d[2]);
+    else if (d.length === 2) return Utils.roundToHundredths(d[0] / d[1]);
+    else if (d.length === 3) return Utils.roundToHundredths(d[0] + d[1] / d[2]);
     else return 0;
 };
 
@@ -761,7 +634,7 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
             };
         });
 
-        return splitArray(rawFoods, ({ name }) => name.trim() === '~');
+        return Utils.splitArray(rawFoods, ({ name }) => name.trim() === '~');
     });
 
     return _.zipWith(
@@ -787,8 +660,6 @@ interface NutritionProduct {
     readonly foods: Food[];
 }
 
-const compareInaccurately = (str1: string, str2: string) => distance(str1, str2) > 0.75;
-
 export interface NutritionCategory {
     category: string;
     products: NutritionProduct[];
@@ -812,12 +683,14 @@ export const nutrition = async (
         const units = _.uniqWith(
             _.map(foodsByProductId, ({ unit }) => unit),
             (unit1, unit2) => {
-                return compareInaccurately(unit1, unit2);
+                return Utils.compareStringsInaccurately(unit1, unit2);
             }
         );
 
         const foodsByUnits = units.map((unit) => {
-            return foodsByProductId.filter((food) => compareInaccurately(food.unit, unit));
+            return foodsByProductId.filter((food) =>
+                Utils.compareStringsInaccurately(food.unit, unit)
+            );
         });
 
         return {
@@ -828,7 +701,7 @@ export const nutrition = async (
                     foods,
                     (result, food) => {
                         return {
-                            eaten: roundToHundredths(result.eaten + food.portion),
+                            eaten: Utils.roundToHundredths(result.eaten + food.portion),
                             unit: food.unit,
                         };
                     },
@@ -910,10 +783,6 @@ export const findDailyDocInAncestors = async (rem: SDK.Rem): Promise<SDK.Rem | u
     else return findDailyDocInAncestors(parentRem);
 };
 
-const roundToTens = (num: number): number => {
-    return _.round(num * 10) / 10;
-};
-
 export const calculateAndSetQuota = async (
     plugin: SDK.RNPlugin,
     dailyRem: SDK.Rem
@@ -944,7 +813,7 @@ export const calculateAndSetQuota = async (
         [0, 0] as [number, number]
     );
 
-    const quota = roundToTens(goodSumPom / QUOTA_FACTOR - badSumPom + prevQuota);
+    const quota = Utils.roundToTens(goodSumPom / QUOTA_FACTOR - badSumPom + prevQuota);
     const quotaRem = await getQuotaRem(dailyRem);
     quotaRem?.setBackText([_.toString(quota)]);
 };
@@ -1012,7 +881,7 @@ const collapseProductEnvironment = async (
 
 export const addPortalProduct = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<void> => {
     const docName = await richTextToString(plugin, dailyRem.text);
-    const docDate = convertOrdinalDateToDate(docName);
+    const docDate = Utils.convertOrdinalDateToDate(docName);
     if (_.isUndefined(docDate)) return;
 
     const { toast } = plugin.app;
