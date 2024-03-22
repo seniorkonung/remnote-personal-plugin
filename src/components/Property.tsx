@@ -3,20 +3,21 @@ import * as SDK from '@remnote/plugin-sdk';
 import _ from 'lodash';
 import { RichText } from './RichText';
 
-interface RitualProps {
-    readonly ritual: App.Ritual;
+interface PropertyProps {
+    readonly text?: SDK.RichTextInterface;
+    readonly backText?: SDK.RichTextInterface;
 }
 
-export function Ritual({ ritual }: RitualProps) {
+export function Property({ text, backText }: PropertyProps) {
     const plugin = SDK.usePlugin();
     const name =
         App.Hooks.useRunAsync(async () => {
-            return App.richTextToString(plugin, ritual.rem.text).then(_.trim);
-        }, [plugin, ritual]) ?? '';
+            return App.richTextToString(plugin, text).then(_.trim);
+        }, [plugin, text]) ?? '';
     const value =
         App.Hooks.useRunAsync(async () => {
-            return App.richTextToHtml(plugin, ritual.rem.backText).then(_.trim);
-        }, [plugin, ritual]) ?? '';
+            return App.richTextToHtml(plugin, backText).then(_.trim);
+        }, [plugin, backText]) ?? '';
 
     const isNumber = _.isEmpty(value) ? false : _.isFinite(_.toNumber(value));
     const isCheckbox = ['Yes', 'No'].includes(value);
@@ -24,7 +25,6 @@ export function Ritual({ ritual }: RitualProps) {
     return (
         <div>
             <p className="font-medium my-3">{name}:</p>
-
             <p className="italic my-3">
                 {isNumber ? (
                     <span
@@ -36,7 +36,7 @@ export function Ritual({ ritual }: RitualProps) {
                 ) : isCheckbox ? (
                     <span>{value === 'Yes' ? '✅' : '❌'}</span>
                 ) : (
-                    <RichText richText={ritual.rem.backText} defaultValue="-" />
+                    <RichText richText={backText} defaultValue="-" />
                 )}
             </p>
         </div>

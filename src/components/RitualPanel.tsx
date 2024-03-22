@@ -2,7 +2,7 @@ import * as SDK from '@remnote/plugin-sdk';
 import * as App from '../App';
 import _ from 'lodash';
 import { Day } from './Day';
-import { Ritual } from './Ritual';
+import { Property } from './Property';
 
 interface RitualPanelProps {
     readonly dailyDocs: App.DailyDoc[];
@@ -24,7 +24,13 @@ export function RitualPanel({ dailyDocs }: RitualPanelProps) {
             <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
                 <div className="grid grid-cols-2 gap-2 px-2">
                     {rituals.map((ritual) => {
-                        return <Ritual key={ritual.rem._id} ritual={ritual} />;
+                        return (
+                            <Property
+                                key={ritual.rem._id}
+                                text={ritual.rem.text}
+                                backText={ritual.rem.backText}
+                            />
+                        );
                     })}
                 </div>
             </Day>
