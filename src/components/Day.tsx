@@ -1,21 +1,25 @@
 import * as App from '../App';
 import * as React from 'react';
-import * as SDK from '@remnote/plugin-sdk';
+import _ from 'lodash';
 
 interface DayProps {
     readonly dailyDoc: App.DailyDoc;
+    readonly contentAfter?: React.JSX.Element;
     readonly children: React.JSX.Element | React.JSX.Element[];
 }
 
-export function Day({ dailyDoc, children }: DayProps) {
+export function Day({ dailyDoc, contentAfter, children }: DayProps) {
     return (
         <div>
-            <h1
-                className="text-2xl hover:cursor-pointer underline underline-offset-4"
-                style={{ color: '#7c6efa' }}
-                onClick={() => dailyDoc.rem.openRemAsPage()}
-            >
-                {dailyDoc.name}
+            <h1 className="text-2xl">
+                <span
+                    className="hover:cursor-pointer underline underline-offset-4"
+                    style={{ color: '#7c6efa' }}
+                    onClick={() => dailyDoc.rem.openRemAsPage()}
+                >
+                    {dailyDoc.name}
+                </span>
+                {_.isNotUndefined(contentAfter) && <span>{contentAfter}</span>}
             </h1>
             <div>{children}</div>
         </div>
