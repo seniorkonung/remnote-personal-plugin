@@ -66,10 +66,6 @@ export const REM_TEXT_RATIONS_TIME = 'Время до';
 export const REM_TEXT_RATIONS_HUNGER_BEFORE = 'Состояние до';
 export const REM_TEXT_RATIONS_HUNGER_AFTER = 'Состояние после';
 
-export const log = (...args: any[]): void => {
-    console.log('%cApp(%d): ', 'color: yellow', Date.now() / 1000, ...args);
-};
-
 export const years = (): number[] => {
     return _.times(new Date().getFullYear() - STARTING_YEAR + 1, FP.add(STARTING_YEAR)).reverse();
 };

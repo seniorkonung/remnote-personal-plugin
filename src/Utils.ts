@@ -23,6 +23,10 @@ _.mixin({
     },
 } as Pick<_.LoDashStatic, 'block' | 'asyncMap' | 'isNotUndefined'>);
 
+export const log = (...args: any[]): void => {
+    console.log('%cApp(%d): ', 'color: yellow', Date.now() / 1000, ...args);
+};
+
 export const firstSunday = (date: Date): Date => {
     if (date.getDay() === 0) return date;
     else return new Date(date.getFullYear(), date.getMonth(), date.getDate() + (7 - date.getDay()));
