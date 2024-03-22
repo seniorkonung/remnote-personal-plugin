@@ -6,17 +6,21 @@ import _ from 'lodash';
 
 interface RichTextProps {
     readonly richText?: SDK.RichTextInterface;
+    readonly embededdHtml?: string;
     readonly defaultValue?: string | React.JSX.Element;
 }
 
-export function RichText({ richText, defaultValue }: RichTextProps) {
+export function RichText(props: RichTextProps) {
     const plugin = SDK.usePlugin();
     const spanRef = React.useRef<HTMLSpanElement>(null);
 
     const html =
         App.Hooks.useRunAsync(async () => {
-            return Helpers.richTextToEmbeddedHtml(plugin, richText);
-        }, [plugin, richText]) ?? '';
+            if (_.isNotUndefined(props.embededdHtml)) return props.embededdHtml;
+            else return Helpers.richTextToEmbeddedHtml(plugin, props.richText);
+        }, [plugin, props.richText]) ??
+        props.embededdHtml ??
+        '';
 
     React.useEffect(() => {
         const span = spanRef.current;
@@ -43,7 +47,6 @@ export function RichText({ richText, defaultValue }: RichTextProps) {
         };
     }, [html]);
 
-    if (_.isUndefined(richText)) return <span>{defaultValue}</span>;
-    else if (_.isEmpty(html.trim())) return <span>{defaultValue}</span>;
+    if (_.isEmpty(html.trim())) return <span>{props.defaultValue}</span>;
     else return <span ref={spanRef} dangerouslySetInnerHTML={{ __html: html }}></span>;
 }
