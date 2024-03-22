@@ -40,11 +40,11 @@ export function Main(props: MainProps) {
                                 style={{ borderColor: thesis.color, color: thesis.color }}
                             >
                                 {thesis.isGood
-                                    ? '+'
+                                    ? '↑'
                                     : thesis.isBad
-                                    ? '-'
+                                    ? '↓'
                                     : thesis.isEvent
-                                    ? '!'
+                                    ? '⇄'
                                     : thesis.isInfo
                                     ? '~'
                                     : '?'}
