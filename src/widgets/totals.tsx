@@ -18,7 +18,7 @@ function Totals() {
         setSelectedMonth,
         setSelectedSprint,
     } = App.Hooks.useDateFilter();
-    const type = App.Hooks.useFilterType();
+    const panel = App.Hooks.usePanel();
 
     const dailyDocs =
         App.Hooks.useRunAsync(async () => {
@@ -94,35 +94,37 @@ function Totals() {
                     </label>
                     <select
                         id="types"
-                        onChange={(e) => type.setSelectedType(e.currentTarget.value as App.TYPES)}
-                        value={type.selectedType}
+                        onChange={(e) =>
+                            panel.setSelectedPanel(e.currentTarget.value as App.PANELS)
+                        }
+                        value={panel.selectedPanel}
                         className="border text-sm rounded-lg p-2"
                     >
-                        <option value={App.TYPES.MAIN}>{App.TYPES.MAIN}</option>
-                        <option value={App.TYPES.REGIME}>{App.TYPES.REGIME}</option>
-                        <option value={App.TYPES.RITUALS}>{App.TYPES.RITUALS}</option>
-                        <option value={App.TYPES.SYMPTOMS}>{App.TYPES.SYMPTOMS}</option>
-                        <option value={App.TYPES.POMODORO}>{App.TYPES.POMODORO}</option>
-                        <option value={App.TYPES.NUTRITION}>{App.TYPES.NUTRITION}</option>
-                        <option value={App.TYPES.RATIONS}>{App.TYPES.RATIONS}</option>
+                        <option value={App.PANELS.MAIN}>{App.PANELS.MAIN}</option>
+                        <option value={App.PANELS.REGIME}>{App.PANELS.REGIME}</option>
+                        <option value={App.PANELS.RITUALS}>{App.PANELS.RITUALS}</option>
+                        <option value={App.PANELS.SYMPTOMS}>{App.PANELS.SYMPTOMS}</option>
+                        <option value={App.PANELS.POMODORO}>{App.PANELS.POMODORO}</option>
+                        <option value={App.PANELS.NUTRITION}>{App.PANELS.NUTRITION}</option>
+                        <option value={App.PANELS.RATIONS}>{App.PANELS.RATIONS}</option>
                     </select>
                 </div>
             </form>
 
             <div className="mt-8">
-                {type.isSymptoms() ? (
+                {panel.isSymptoms() ? (
                     <SymptomPanel dailyDocs={dailyDocs} />
-                ) : type.isRegime() ? (
+                ) : panel.isRegime() ? (
                     <RegimePanel dailyDocs={dailyDocs} />
-                ) : type.isPomodoro() ? (
+                ) : panel.isPomodoro() ? (
                     <PomodoroPanel dailyDocs={dailyDocs} />
-                ) : type.isRituals() ? (
+                ) : panel.isRituals() ? (
                     <RitualPanel dailyDocs={dailyDocs} />
-                ) : type.isRations() ? (
+                ) : panel.isRations() ? (
                     <RationPanel dailyDocs={dailyDocs} />
-                ) : type.isNutrition() ? (
+                ) : panel.isNutrition() ? (
                     <NutritionPanel dailyDocs={dailyDocs} />
-                ) : type.isMain() ? (
+                ) : panel.isMain() ? (
                     <MainPanel dailyDocs={dailyDocs} />
                 ) : null}
             </div>

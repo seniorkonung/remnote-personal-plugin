@@ -21,7 +21,7 @@ export const MONTHS = [
     'Декабрь',
 ];
 
-export enum TYPES {
+export enum PANELS {
     MAIN = '🏠 Главное',
     NUTRITION = '🍱 Питание',
     POMODORO = '🍅 Помидоры',

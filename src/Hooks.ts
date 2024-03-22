@@ -54,20 +54,20 @@ export function useDateFilter() {
     };
 }
 
-export function useFilterType() {
-    const [selectedType, setSelectedType] = SDK.useSessionStorageState(
+export function usePanel() {
+    const [selectedPanel, setSelectedPanel] = SDK.useSessionStorageState(
         'selected_type',
-        App.TYPES.MAIN
+        App.PANELS.MAIN
     );
     return {
-        isMain: () => selectedType === App.TYPES.MAIN,
-        isNutrition: () => selectedType === App.TYPES.NUTRITION,
-        isPomodoro: () => selectedType === App.TYPES.POMODORO,
-        isRations: () => selectedType === App.TYPES.RATIONS,
-        isSymptoms: () => selectedType === App.TYPES.SYMPTOMS,
-        isRegime: () => selectedType === App.TYPES.REGIME,
-        isRituals: () => selectedType === App.TYPES.RITUALS,
-        selectedType,
-        setSelectedType,
+        isMain: () => selectedPanel === App.PANELS.MAIN,
+        isNutrition: () => selectedPanel === App.PANELS.NUTRITION,
+        isPomodoro: () => selectedPanel === App.PANELS.POMODORO,
+        isRations: () => selectedPanel === App.PANELS.RATIONS,
+        isSymptoms: () => selectedPanel === App.PANELS.SYMPTOMS,
+        isRegime: () => selectedPanel === App.PANELS.REGIME,
+        isRituals: () => selectedPanel === App.PANELS.RITUALS,
+        selectedPanel,
+        setSelectedPanel,
     };
 }
