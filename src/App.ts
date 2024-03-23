@@ -35,7 +35,6 @@ export enum PANELS {
 
 const STARTING_YEAR = 2023;
 const STARTING_MONTH = MONTHS.indexOf('Июнь');
-const VERSION_START_DAY = new Date(2024, MONTHS.indexOf('Январь'), 7);
 const ALL_SPRINT = 'Все';
 const QUOTA_FACTOR = 10;
 
