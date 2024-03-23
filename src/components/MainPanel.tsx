@@ -15,11 +15,18 @@ export function MainPanel({ dailyDocs }: MainPanelProps) {
         App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
                 const others = await App.others(plugin, dailyDoc.rem);
-                const version = App.version(dailyDoc.name);
+                const daysUntilEndOfYear = App.daysUntilEndOfYear(dailyDoc.name);
                 const daysUntilEndOfMonth = App.daysUntilEndOfMonth(dailyDoc.name);
                 const notesCount = await App.notesCount(plugin, dailyDoc.rem);
                 const theses = await App.theses(plugin, dailyDoc.rem);
-                return { dailyDoc, others, version, daysUntilEndOfMonth, notesCount, theses };
+                return {
+                    dailyDoc,
+                    others,
+                    daysUntilEndOfYear,
+                    daysUntilEndOfMonth,
+                    notesCount,
+                    theses,
+                };
             });
         }, [plugin, dailyDocs]) ?? [];
 
@@ -38,7 +45,7 @@ export function MainPanel({ dailyDocs }: MainPanelProps) {
                     <Main
                         others={params.others}
                         daysUntilEndOfMonth={params.daysUntilEndOfMonth}
-                        version={params.version}
+                        daysUntilEndOfYear={params.daysUntilEndOfYear}
                         notesCount={params.notesCount}
                         theses={params.theses}
                     />

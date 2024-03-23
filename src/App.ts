@@ -359,11 +359,12 @@ export const others = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<O
     });
 };
 
-export const version = (dailyDocName: string): number => {
+export const daysUntilEndOfYear = (dailyDocName: string): number => {
     const dateOfDay = Utils.convertOrdinalDateToDate(dailyDocName);
     if (_.isUndefined(dateOfDay)) return -1;
+    const lastDay = new Date(dateOfDay.getFullYear() + 1, MONTHS.indexOf('Январь'), 0);
     const msInDay = 1000 * 60 * 60 * 24;
-    return _.ceil((dateOfDay.getTime() - VERSION_START_DAY.getTime()) / msInDay) + 1;
+    return _.ceil((lastDay.getTime() - dateOfDay.getTime()) / msInDay);
 };
 
 export const daysUntilEndOfMonth = (dailyDocName: string): number => {

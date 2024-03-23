@@ -5,7 +5,7 @@ import { RichText } from './RichText';
 
 interface MainProps {
     readonly others: App.Other[];
-    readonly version: number;
+    readonly daysUntilEndOfYear: number;
     readonly daysUntilEndOfMonth: number;
     readonly theses: App.Thesis[];
     readonly notesCount: number;
@@ -15,7 +15,10 @@ export function Main(props: MainProps) {
     return (
         <div>
             <div className="grid grid-cols-2 gap-2">
-                <Property text={['Версия']} backText={[_.toString(props.version)]} />
+                <Property
+                    text={['До конца года']}
+                    backText={[_.toString(props.daysUntilEndOfYear)]}
+                />
                 <Property
                     text={['До конца месяца']}
                     backText={[_.toString(props.daysUntilEndOfMonth)]}
