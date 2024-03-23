@@ -11,7 +11,7 @@ export function Symptom({ symptom }: SymptomProps) {
             <span className="font-medium">
                 <RichText richText={symptom.rem.text} />
             </span>
-            <ul>
+            <ul style={{ paddingInlineStart: '1.6em' }}>
                 {symptom.notes.map((note) => {
                     return (
                         <li className="mt-3" key={note.rem._id}>
