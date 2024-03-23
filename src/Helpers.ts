@@ -26,7 +26,7 @@ export const richTextToHtml = async (
         if (_.isUndefined(textOfDeletedRem)) return richElement;
         else
             return [
-                '🗑️ ',
+                '🗑️ | ',
                 ...(_.last(
                     Utils.splitArray(textOfDeletedRem, (x) => _.isString(x) && x.trim() === '|')
                 ) ?? []),
