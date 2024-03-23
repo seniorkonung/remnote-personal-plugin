@@ -26,7 +26,7 @@ function Totals() {
         }, [plugin, selectedYear, selectedMonth, selectedSprint]) ?? [];
 
     return (
-        <div className="px-2">
+        <div className="px-2 pb-20">
             <form className="grid grid-cols-2 gap-x-8 gap-y-4">
                 <div className="flex flex-col gap-y-2">
                     <label htmlFor="years" className="text-sm font-medium">
