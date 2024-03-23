@@ -12,7 +12,11 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
                 className="w-1"
                 style={{
                     height: '80%',
-                    backgroundColor: isTotal ? 'blue' : pomodoro.isBad ? 'red' : 'green',
+                    backgroundColor: isTotal
+                        ? 'var(--text-color-blue)'
+                        : pomodoro.isBad
+                        ? 'var(--text-color-red)'
+                        : 'var(--text-color-green)',
                 }}
             ></div>
 
@@ -22,7 +26,7 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
                     style={{
                         letterSpacing: '0.025em',
                         color: 'white',
-                        backgroundColor: 'blue',
+                            backgroundColor: 'var(--text-color-blue)',
                     }}
                 >
                     {pomodoro.name}
