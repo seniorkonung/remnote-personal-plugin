@@ -422,7 +422,7 @@ export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<T
         });
 
         _.forEach(marks, (mark) => {
-            mark.style.backgroundColor = 'transparent';
+            mark.outerHTML = mark.innerText;
         });
 
         return {
