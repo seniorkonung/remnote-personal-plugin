@@ -19,7 +19,7 @@ export function Regime({ regime }: RegimeProps) {
             </div>
 
             <div>
-                <p className="font-medium my-3">{App.REM_TEXT_WAKING_TIME}:</p>
+                <p className="font-medium my-3">Время бдения:</p>
                 <p
                     className="italic my-3 underline underline-offset-4"
                     style={{ letterSpacing: '0.05em', textDecorationColor: 'orange' }}
@@ -49,29 +49,24 @@ export function Regime({ regime }: RegimeProps) {
             </div>
 
             <div className="col-span-2">
-                <div className="flex gap-2 items-center">
-                    <p className="font-medium my-3">{App.REM_TEXT_WAKING}</p>
-                    <span>—</span>
-                    <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
-                        <RichText richText={regime.waking?.backText} defaultValue={'-'} />
-                    </p>
-                </div>
+                <p className="font-medium my-3">{App.REM_TEXT_WAKING}:</p>
+                <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
+                    <RichText richText={regime.waking?.backText} defaultValue={'-'} />
+                </p>
+            </div>
 
-                <div className="flex gap-2 items-center">
-                    <p className="font-medium my-3">{App.REM_TEXT_VIGOR_LEVEL}</p>
-                    <span>—</span>
-                    <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
-                        <RichText richText={regime.vigorLevel?.backText} defaultValue={'-'} />
-                    </p>
-                </div>
+            <div className="col-span-2">
+                <p className="font-medium my-3">{App.REM_TEXT_VIGOR_LEVEL}:</p>
+                <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
+                    <RichText richText={regime.vigorLevel?.backText} defaultValue={'-'} />
+                </p>
+            </div>
 
-                <div className="flex gap-2 items-center">
-                    <p className="font-medium my-3">{App.REM_TEXT_SLEEP_QUOLITY}</p>
-                    <span>—</span>
-                    <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
-                        <RichText richText={regime.sleepQuolity?.backText} defaultValue={'-'} />
-                    </p>
-                </div>
+            <div className="col-span-2">
+                <p className="font-medium my-3">{App.REM_TEXT_SLEEP_QUOLITY}:</p>
+                <p className="italic my-3" style={{ letterSpacing: '0.025em' }}>
+                    <RichText richText={regime.sleepQuolity?.backText} defaultValue={'-'} />
+                </p>
             </div>
         </div>
     );
