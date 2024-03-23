@@ -3,21 +3,10 @@ import * as Utils from './Utils';
 import _ from 'lodash';
 import FP from 'lodash/fp';
 
-export const getReferencedRemsFromRichText = async (
-    plugin: SDK.RNPlugin,
-    richText?: SDK.RichTextInterface
-): Promise<(SDK.Rem | undefined)[]> => {
-    return _.asyncMap(
-        await plugin.richText.getRemIdsFromRichText(richText ?? []),
-        plugin.rem.findOne
-    );
-};
-
-export const richTextToHtml = async (
-    plugin: SDK.RNPlugin,
-    rawRichText?: SDK.RichTextInterface
-): Promise<string> => {
-    const richText = rawRichText?.flatMap((richElement) => {
+export const flattenRemovedRichTextElements = (
+    richText: SDK.RichTextInterface
+): SDK.RichTextInterface => {
+    return richText.flatMap((richElement) => {
         const textOfDeletedRem = _.block(() => {
             if (_.isObject(richElement) === false) return;
             if ('textOfDeletedRem' in richElement === false) return;
@@ -32,6 +21,28 @@ export const richTextToHtml = async (
                 ) ?? []),
             ];
     });
+};
+
+export const getRemIdsFromRichText = async (
+    plugin: SDK.RNPlugin,
+    rawRichText: SDK.RichTextInterface
+): Promise<string[]> => {
+    const richText = flattenRemovedRichTextElements(rawRichText);
+    return await plugin.richText.getRemIdsFromRichText(richText ?? []);
+};
+
+export const getReferencedRemsFromRichText = async (
+    plugin: SDK.RNPlugin,
+    richText?: SDK.RichTextInterface
+): Promise<(SDK.Rem | undefined)[]> => {
+    return _.asyncMap(await getRemIdsFromRichText(plugin, richText ?? []), plugin.rem.findOne);
+};
+
+export const richTextToHtml = async (
+    plugin: SDK.RNPlugin,
+    rawRichText?: SDK.RichTextInterface
+): Promise<string> => {
+    const richText = flattenRemovedRichTextElements(rawRichText ?? []);
     await getReferencedRemsFromRichText(plugin, richText);
     return await plugin.richText.toHTML(richText ?? []);
 };
@@ -143,19 +154,16 @@ export const richTextToEmbeddedHtml = async (
     if (_.isUndefined(richText)) return '';
 
     const html = await richTextToHtml(plugin, richText);
-    const remsInfo = await _.asyncMap(
-        await plugin.richText.getRemIdsFromRichText(richText),
-        async (id) => {
-            const rem = await plugin.rem.findOne(id);
-            if (_.isUndefined(rem)) return { id };
-            else
-                return {
-                    id,
-                    color: await getHighlightColor(rem),
-                    icon: await getBulletIcon(plugin, rem),
-                };
-        }
-    );
+    const remsInfo = await _.asyncMap(await getRemIdsFromRichText(plugin, richText), async (id) => {
+        const rem = await plugin.rem.findOne(id);
+        if (_.isUndefined(rem)) return { id };
+        else
+            return {
+                id,
+                color: await getHighlightColor(rem),
+                icon: await getBulletIcon(plugin, rem),
+            };
+    });
 
     const node = document.createElement('div');
     node.innerHTML = html;
