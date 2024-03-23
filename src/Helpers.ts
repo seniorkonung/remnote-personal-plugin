@@ -96,6 +96,31 @@ export const getBulletIcon = async (
     else return richTextToString(plugin, iconRem.backText);
 };
 
+export type Color = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple';
+export const stringToColor = (str: string): Color | undefined => {
+    switch (str) {
+        case 'red':
+            return str;
+        case 'orange':
+            return str;
+        case 'yellow':
+            return str;
+        case 'green':
+            return str;
+        case 'blue':
+            return str;
+        case 'purple':
+            return str;
+        default:
+            return;
+    }
+};
+
+export const getHighlightColor = async (rem: SDK.Rem): Promise<Color | undefined> => {
+    const color = _.toLower(await rem?.getHighlightColor());
+    return stringToColor(color);
+};
+
 export const richTextToEmbeddedHtml = async (
     plugin: SDK.RNPlugin,
     richText?: SDK.RichTextInterface
@@ -107,14 +132,13 @@ export const richTextToEmbeddedHtml = async (
         await plugin.richText.getRemIdsFromRichText(richText),
         async (id) => {
             const rem = await plugin.rem.findOne(id);
-            return {
-                id,
-                color: await rem?.getHighlightColor(),
-                icon: await _.block(async () => {
-                    if (_.isUndefined(rem)) return;
-                    else return getBulletIcon(plugin, rem);
-                }),
-            };
+            if (_.isUndefined(rem)) return { id };
+            else
+                return {
+                    id,
+                    color: await getHighlightColor(rem),
+                    icon: await getBulletIcon(plugin, rem),
+                };
         }
     );
 
@@ -125,20 +149,15 @@ export const richTextToEmbeddedHtml = async (
         if (a instanceof HTMLAnchorElement === false) return;
 
         const color = remsInfo.at(i)?.color;
-        a.style.color = _.block(() => {
-            if (_.isUndefined(color)) return '#7c6efa';
-            else if (['Blue', 'Purple'].includes(color)) return 'white';
-            else return 'black';
-        });
-        a.style.cursor = 'pointer';
-        a.style.textDecoration = 'underline';
-        a.style.textUnderlineOffset = '2px';
-
         if (_.isNotUndefined(color)) {
             a.style.padding = '0.1em 0.3em';
             a.style.borderRadius = '0.3em';
-            a.style.backgroundColor = remsInfo.at(i)?.color ?? '';
+            a.classList.add(`highlight-color--${color}`);
+            a.classList.add('rn-clr-content-primary');
+        } else {
+            a.classList.add('text-blue-60');
         }
+        a.classList.add('cursor-pointer');
 
         const icon = remsInfo.at(i)?.icon;
         if (_.isNotUndefined(icon)) {

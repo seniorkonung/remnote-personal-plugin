@@ -13,8 +13,7 @@ export function Day({ dailyDoc, contentAfter, children }: DayProps) {
         <div>
             <h1 className="text-2xl">
                 <span
-                    className="hover:cursor-pointer underline underline-offset-4"
-                    style={{ color: '#7c6efa' }}
+                    className="underline underline-offset-4 text-blue-60 cursor-pointer"
                     onClick={() => dailyDoc.rem.openRemAsPage()}
                 >
                     {dailyDoc.name}

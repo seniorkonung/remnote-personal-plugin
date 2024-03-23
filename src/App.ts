@@ -300,7 +300,9 @@ export const pomodoros = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promis
         );
         return {
             rem,
-            isBad: (await referencedRem?.getHighlightColor()) === 'Red',
+            isBad:
+                _.isNotUndefined(referencedRem) &&
+                _.isEqual(await Helpers.getHighlightColor(referencedRem), 'red'),
             name: await Helpers.richTextToString(plugin, rem?.text),
             value: _.toNumber(await Helpers.richTextToString(plugin, rem.backText)),
         };
@@ -416,7 +418,7 @@ export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<T
                 })
             );
             if (_.isUndefined(firstMark)) return '';
-            return firstMark.style.backgroundColor;
+            return Helpers.stringToColor(firstMark.style.backgroundColor) ?? '';
         });
 
         _.forEach(marks, (mark) => {
@@ -427,10 +429,10 @@ export const theses = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<T
             color,
             embeddedHtml: node.innerHTML,
             text: node.innerText.trim(),
-            isGood: ['yellow', 'green'].includes(color),
-            isEvent: ['blue', 'purple'].includes(color),
-            isBad: ['red', 'orange'].includes(color),
-            isInfo: _.isEmpty(color),
+            isGood: 'yellow' === color || 'green' === color,
+            isEvent: 'blue' === color || 'purple' === color,
+            isBad: 'red' === color || 'orange' === color,
+            isInfo: '' === color,
         };
     };
 
