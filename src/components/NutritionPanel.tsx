@@ -78,7 +78,7 @@ export function NutritionPanel({ dailyDocs }: NutritionPanelProps) {
             return (
                 <div className="flex items-center gap-3" key={product.rem._id}>
                     <span
-                        className="flex justify-center items-center h-8 w-8 border-px border-solid rounded-full font-bold"
+                        className="flex-none flex justify-center items-center h-8 w-8 border-px border-solid rounded-full font-bold"
                         style={{ borderColor: 'green' }}
                     >
                         {product.foods.length}
