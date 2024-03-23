@@ -17,14 +17,20 @@ export const richTextToHtml = async (
     plugin: SDK.RNPlugin,
     rawRichText?: SDK.RichTextInterface
 ): Promise<string> => {
-    const richText = rawRichText?.map((richElement) => {
+    const richText = rawRichText?.flatMap((richElement) => {
         const textOfDeletedRem = _.block(() => {
             if (_.isObject(richElement) === false) return;
             if ('textOfDeletedRem' in richElement === false) return;
             return richElement.textOfDeletedRem;
         });
         if (_.isUndefined(textOfDeletedRem)) return richElement;
-        else return '🗑️ ' + (_.last(textOfDeletedRem) ?? '');
+        else
+            return [
+                '🗑️ ',
+                ...(_.last(
+                    Utils.splitArray(textOfDeletedRem, (x) => _.isString(x) && x.trim() === '|')
+                ) ?? []),
+            ];
     });
     await getReferencedRemsFromRichText(plugin, richText);
     return await plugin.richText.toHTML(richText ?? []);
