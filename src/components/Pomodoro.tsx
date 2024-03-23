@@ -20,38 +20,40 @@ export function Pomodoro({ pomodoro, isTotal = false }: PomodoroProps) {
                 }}
             ></div>
 
-            {isTotal ? (
-                <p
-                    className="font-semibold my-2 my-1 px-2 py-1 rounded-md"
-                    style={{
-                        letterSpacing: '0.025em',
-                        color: 'white',
+            <div className="my-2">
+                {isTotal ? (
+                    <span
+                        className="font-semibold px-2 py-1 rounded-md"
+                        style={{
+                            letterSpacing: '0.025em',
+                            color: 'white',
                             backgroundColor: 'var(--text-color-blue)',
-                    }}
-                >
-                    {pomodoro.name}
-                </p>
-            ) : (
-                <p
-                    className="font-semibold my-2"
+                        }}
+                    >
+                        {pomodoro.name}
+                    </span>
+                ) : (
+                    <span
+                        className="font-semibold"
+                        style={{
+                            letterSpacing: '0.025em',
+                        }}
+                    >
+                        {pomodoro.name}
+                    </span>
+                )}
+
+                <span
+                    className="italic"
                     style={{
                         letterSpacing: '0.025em',
                     }}
                 >
-                    {pomodoro.name}
-                </p>
-            )}
-
-            <p
-                className="italic my-2 flex gap-2 content-center"
-                style={{
-                    letterSpacing: '0.025em',
-                }}
-            >
-                <span>—</span>
-                <span className="font-bold">{pomodoro.value}</span>
-                <span style={{ opacity: '.75' }}>пом.</span>
-            </p>
+                    <span> — </span>
+                    <span className="font-bold">{pomodoro.value} </span>
+                    <span style={{ opacity: '.75' }}>пом.</span>
+                </span>
+            </div>
         </div>
     );
 }
