@@ -15,8 +15,17 @@ export const getReferencedRemsFromRichText = async (
 
 export const richTextToHtml = async (
     plugin: SDK.RNPlugin,
-    richText?: SDK.RichTextInterface
+    rawRichText?: SDK.RichTextInterface
 ): Promise<string> => {
+    const richText = rawRichText?.map((richElement) => {
+        const textOfDeletedRem = _.block(() => {
+            if (_.isObject(richElement) === false) return;
+            if ('textOfDeletedRem' in richElement === false) return;
+            return richElement.textOfDeletedRem;
+        });
+        if (_.isUndefined(textOfDeletedRem)) return richElement;
+        else return '🗑️ ' + (_.last(textOfDeletedRem) ?? '');
+    });
     await getReferencedRemsFromRichText(plugin, richText);
     return await plugin.richText.toHTML(richText ?? []);
 };
