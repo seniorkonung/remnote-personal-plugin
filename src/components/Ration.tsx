@@ -17,11 +17,11 @@ export function Ration({ ration }: RationProps) {
         foods.map((food) => {
             return (
                 <li key={food.rem._id}>
-                    <div className="flex gap-1.5">
+                    <div>
                         <span className="font-semibold">
                             <RichText richText={food.rem.text} defaultValue="-" />
                         </span>
-                        <span>—</span>
+                        <span> — </span>
                         <span className="italic" style={{ letterSpacing: '0.025em' }}>
                             <span className="font-bold">{food.portion}</span>{' '}
                             <span style={{ opacity: '.75' }}>{food.unit}</span>
@@ -34,18 +34,20 @@ export function Ration({ ration }: RationProps) {
     return (
         <li>
             <div className="flex items-center gap-4 font-medium">
-                <span>
+                <span className="whitespace-nowrap">
                     <span>🕰️ </span>
                     <span className="italic" style={{ letterSpacing: '0.025em' }}>
                         {time}
                     </span>
                 </span>
-                <div className="flex gap-1.5">
-                    <span>⛽ </span>
-                    <span className="italic" style={{ letterSpacing: '0.025em' }}>
-                        <RichText richText={ration.hungerBefore?.backText} defaultValue="-" />
+                <div className="text-right">
+                    <span className="whitespace-nowrap">
+                        <span>⛽ </span>
+                        <span className="italic" style={{ letterSpacing: '0.025em' }}>
+                            <RichText richText={ration.hungerBefore?.backText} defaultValue="-" />
+                        </span>
                     </span>
-                    <span className="font-medium">→</span>
+                    <span className="font-medium"> → </span>
                     <span className="italic" style={{ letterSpacing: '0.025em' }}>
                         <RichText richText={ration.hungerAfter?.backText} defaultValue="-" />
                     </span>
@@ -56,7 +58,7 @@ export function Ration({ ration }: RationProps) {
                 {ration.snacks.map((snack, i) => {
                     const isSnack = i !== 0;
                     return (
-                        <ul className="grid gap-3">
+                        <ul className="grid gap-3" style={{ paddingInlineStart: '1em' }}>
                             <span>{isSnack ? '~' : null}</span>
                             {foods(snack)}
                         </ul>

@@ -46,7 +46,7 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
         return (
             <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
                 <p className="flex flex-wrap gap-1">{categories}</p>
-                <ol className="grid gap-3 mt-6">
+                <ol className="grid gap-3 mt-6" style={{ paddingInlineStart: '1.6em' }}>
                     {rations.map((ration) => {
                         return <Ration ration={ration} />;
                     })}
