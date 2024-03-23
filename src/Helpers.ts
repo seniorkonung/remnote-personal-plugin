@@ -83,6 +83,19 @@ export const hasTagInRem =
         }).then(FP.includes(true));
     };
 
+export const getBulletIcon = async (
+    plugin: SDK.RNPlugin,
+    rem: SDK.Rem
+): Promise<string | undefined> => {
+    const iconRem = await getRems(plugin, rem, async (plugin, rem) => {
+        const text = await richTextToString(plugin, rem.text);
+        return text.includes('Bullet Icon');
+    }).then(_.head);
+
+    if (_.isUndefined(iconRem)) return;
+    else return richTextToString(plugin, iconRem.backText);
+};
+
 export const richTextToEmbeddedHtml = async (
     plugin: SDK.RNPlugin,
     richText?: SDK.RichTextInterface
@@ -99,14 +112,7 @@ export const richTextToEmbeddedHtml = async (
                 color: await rem?.getHighlightColor(),
                 icon: await _.block(async () => {
                     if (_.isUndefined(rem)) return;
-
-                    const iconRem = await getRems(plugin, rem, async (plugin, rem) => {
-                        const text = await richTextToString(plugin, rem.text);
-                        return text.includes('Bullet Icon');
-                    }).then(_.head);
-
-                    if (_.isUndefined(iconRem)) return;
-                    else return richTextToString(plugin, iconRem.backText);
+                    else return getBulletIcon(plugin, rem);
                 }),
             };
         }
