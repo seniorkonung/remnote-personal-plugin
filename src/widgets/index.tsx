@@ -51,7 +51,7 @@ async function onActivate(plugin: SDK.ReactRNPlugin) {
         div[data-document-id="${totalsPowerup._id}"] .rn-add-rem-button { display: none }
         div[data-node-id="${mainTotalsRem._id}"], div[data-children-node-id="${mainTotalsRem._id}"] { display: none; }
         div[data-document-id="${totalsPowerup._id}"] #document { max-width: 100% }
-        div[data-rem-container-id="${mainTotalsRem._id}"] div:has(> .rn-plugin-root) { height: 80vh; padding-top: 1.5rem }
+        div[data-rem-container-id="${mainTotalsRem._id}"] div:has(> .rn-plugin-root) { height: 82vh; padding-top: 1.5rem }
         div[data-children-node-id="${totalsPowerup._id}"] > div:nth-last-child(2) { display: none }
     `
     );
