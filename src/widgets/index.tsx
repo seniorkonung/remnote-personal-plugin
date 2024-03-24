@@ -47,6 +47,7 @@ async function onActivate(plugin: SDK.ReactRNPlugin) {
     await plugin.app.registerCSS(
         'Styles for powerup totals',
         `
+        div[data-document-id="${totalsPowerup._id}"] #DropToOpenAsDocument { display: none }
         div[data-document-id="${totalsPowerup._id}"] .rn-add-rem-button { display: none }
         div[data-node-id="${mainTotalsRem._id}"], div[data-children-node-id="${mainTotalsRem._id}"] { display: none; }
         div[data-document-id="${totalsPowerup._id}"] #document { max-width: 100% }
