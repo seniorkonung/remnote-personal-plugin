@@ -17,7 +17,7 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
                 return {
                     dailyDoc,
                     rations: await App.rations(plugin, dailyDoc.rem),
-                    zoomTitle: await _.block(async () => {
+                    zoom: await _.block(async () => {
                         const rem = await App.Helpers.getRems(
                             plugin,
                             dailyDoc.rem,
@@ -30,7 +30,7 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
             });
         }, [plugin, dailyDocs]) ?? [];
 
-    const days = dailyDocsAndRations.map(({ dailyDoc, rations, zoomTitle }) => {
+    const days = dailyDocsAndRations.map(({ dailyDoc, rations, zoom }) => {
         const categories = _.chain(rations)
             .flatMap(({ snacks }) => _.flatten(snacks))
             .flatMap(({ categories }) => categories)
@@ -55,7 +55,7 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
             .value();
 
         return (
-            <Day key={dailyDoc.rem._id} title="Рационы" zoomTitle={zoomTitle} dailyDoc={dailyDoc}>
+            <Day key={dailyDoc.rem._id} zoom={zoom} dailyDoc={dailyDoc}>
                 <p className="flex flex-wrap gap-1">{categories}</p>
                 <ol className="grid gap-3 mt-6" style={{ paddingInlineStart: '1.6em' }}>
                     {rations.map((ration) => {

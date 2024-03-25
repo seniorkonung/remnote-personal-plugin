@@ -17,7 +17,7 @@ export function RitualPanel({ dailyDocs }: RitualPanelProps) {
                 return {
                     dailyDoc,
                     rituals: await App.rituals(plugin, dailyDoc.rem),
-                    zoomTitle: await _.block(async () => {
+                    zoom: await _.block(async () => {
                         const rem = await App.Helpers.getRems(
                             plugin,
                             dailyDoc.rem,
@@ -31,9 +31,9 @@ export function RitualPanel({ dailyDocs }: RitualPanelProps) {
             });
         }, [plugin, dailyDocs]) ?? [];
 
-    const days = dailyDocsAndRituals.map(({ dailyDoc, rituals, zoomTitle }) => {
+    const days = dailyDocsAndRituals.map(({ dailyDoc, rituals, zoom }) => {
         return (
-            <Day key={dailyDoc.rem._id} title="Ритуалы" zoomTitle={zoomTitle} dailyDoc={dailyDoc}>
+            <Day key={dailyDoc.rem._id} zoom={zoom} dailyDoc={dailyDoc}>
                 <div className="grid grid-cols-2 gap-2 px-2">
                     {rituals.map((ritual) => {
                         return (

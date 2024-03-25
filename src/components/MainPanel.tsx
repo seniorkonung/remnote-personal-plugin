@@ -21,7 +21,7 @@ export function MainPanel({ dailyDocs }: MainPanelProps) {
                     daysUntilEndOfMonth: App.daysUntilEndOfMonth(dailyDoc.name),
                     notesCount: await App.notesCount(plugin, dailyDoc.rem),
                     theses: await App.theses(plugin, dailyDoc.rem),
-                    zoomTitle: await _.block(async () => {
+                    zoom: await _.block(async () => {
                         const rem = await App.Helpers.getRems(
                             plugin,
                             dailyDoc.rem,
@@ -39,8 +39,7 @@ export function MainPanel({ dailyDocs }: MainPanelProps) {
             <Day
                 key={dailyDoc.rem._id}
                 dailyDoc={dailyDoc}
-                title="Заметки"
-                zoomTitle={params.zoomTitle}
+                zoom={params.zoom}
                 contentAfter={
                     <span className="text-sm font-medium align-bottom">{params.notesCount} 🖊️</span>
                 }

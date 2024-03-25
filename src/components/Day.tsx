@@ -4,8 +4,7 @@ import _ from 'lodash';
 
 interface DayProps {
     readonly dailyDoc: App.DailyDoc;
-    readonly title: string;
-    readonly zoomTitle?: () => void;
+    readonly zoom?: () => void;
     readonly contentAfter?: React.JSX.Element;
     readonly children: React.JSX.Element | React.JSX.Element[];
 }
@@ -20,15 +19,12 @@ export function Day(props: DayProps) {
                 >
                     {props.dailyDoc.name}
                 </span>
-                <span> | </span>
-                {_.isUndefined(props.zoomTitle) ? (
-                    <span className="text-xl">{props.title}</span>
-                ) : (
-                    <span
-                        className="text-xl underline underline-offset-4 text-blue-60 cursor-pointer"
-                        onClick={props.zoomTitle}
-                    >
-                        {props.title}
+                {_.isNotUndefined(props.zoom) && (
+                    <span>
+                        <span> | </span>
+                        <span className="cursor-pointer" onClick={props.zoom}>
+                            🔎
+                        </span>
                     </span>
                 )}
                 {_.isNotUndefined(props.contentAfter) && <span> {props.contentAfter}</span>}

@@ -17,7 +17,7 @@ export function RegimePanel({ dailyDocs }: RegimePanelProps) {
                 return {
                     dailyDoc,
                     regime: await App.regime(plugin, dailyDoc.rem),
-                    zoomTitle: await _.block(async () => {
+                    zoom: await _.block(async () => {
                         const rem = await App.Helpers.getRems(
                             plugin,
                             dailyDoc.rem,
@@ -31,9 +31,9 @@ export function RegimePanel({ dailyDocs }: RegimePanelProps) {
             });
         }, [plugin, dailyDocs]) ?? [];
 
-    const days = dailyDocsAndRegime.map(({ dailyDoc, regime, zoomTitle }) => {
+    const days = dailyDocsAndRegime.map(({ dailyDoc, regime, zoom }) => {
         return (
-            <Day key={dailyDoc.rem._id} title="Режим" zoomTitle={zoomTitle} dailyDoc={dailyDoc}>
+            <Day key={dailyDoc.rem._id} zoom={zoom} dailyDoc={dailyDoc}>
                 <div className="px-2">
                     <Regime regime={regime} />
                 </div>

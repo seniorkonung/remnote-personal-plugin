@@ -17,7 +17,7 @@ export function SymptomPanel({ dailyDocs }: SymptomPanelProps) {
                 return {
                     dailyDoc,
                     symptoms: await App.symptoms(plugin, dailyDoc.rem),
-                    zoomTitle: await _.block(async () => {
+                    zoom: await _.block(async () => {
                         const rem = await App.Helpers.getRems(
                             plugin,
                             dailyDoc.rem,
@@ -31,9 +31,9 @@ export function SymptomPanel({ dailyDocs }: SymptomPanelProps) {
             });
         }, [plugin, dailyDocs]) ?? [];
 
-    const days = dailyDocsAndSymptoms.map(({ dailyDoc, symptoms, zoomTitle }) => {
+    const days = dailyDocsAndSymptoms.map(({ dailyDoc, symptoms, zoom }) => {
         return (
-            <Day key={dailyDoc.rem._id} title="Симптомы" zoomTitle={zoomTitle} dailyDoc={dailyDoc}>
+            <Day key={dailyDoc.rem._id} zoom={zoom} dailyDoc={dailyDoc}>
                 <ul className="grid gap-3" style={{ paddingInlineStart: '1.6em' }}>
                     {symptoms.map((symptom) => {
                         return <Symptom key={symptom.rem._id} symptom={symptom} />;
