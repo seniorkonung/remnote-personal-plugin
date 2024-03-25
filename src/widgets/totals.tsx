@@ -2,7 +2,7 @@ import * as SDK from '@remnote/plugin-sdk';
 import * as App from '../App';
 import { SymptomPanel } from '../components/SymptomPanel';
 import { RegimePanel } from '../components/RegimePanel';
-import { PomodoroPanel } from '../components/PomodoPanel';
+import { PomodoroPanel } from '../components/PomodoroPanel';
 import { RitualPanel } from '../components/RitualPanel';
 import { RationPanel } from '../components/RationPanel';
 import { NutritionPanel } from '../components/NutritionPanel';
