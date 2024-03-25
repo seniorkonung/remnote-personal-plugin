@@ -31,6 +31,21 @@ export const getRemIdsFromRichText = async (
     return await plugin.richText.getRemIdsFromRichText(richText ?? []);
 };
 
+export const deepRemIdsFromRichText = async (
+    plugin: SDK.RNPlugin,
+    rawRichText: SDK.RichTextInterface
+): Promise<string[]> => {
+    const richText = flattenRemovedRichTextElements(rawRichText);
+    return await plugin.richText.deepGetRemIdsFromRichText(richText ?? []);
+};
+
+export const deepReferencedRemsFromRichText = async (
+    plugin: SDK.RNPlugin,
+    richText?: SDK.RichTextInterface
+): Promise<(SDK.Rem | undefined)[]> => {
+    return _.asyncMap(await deepRemIdsFromRichText(plugin, richText ?? []), plugin.rem.findOne);
+};
+
 export const getReferencedRemsFromRichText = async (
     plugin: SDK.RNPlugin,
     richText?: SDK.RichTextInterface

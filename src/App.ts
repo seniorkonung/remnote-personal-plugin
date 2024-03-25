@@ -623,17 +623,37 @@ export const nutrition = async (
                 );
             }),
             categories: await _.block(async () => {
-                const categoryRem = await Helpers.getRems(
+                const allIngredientsRems = await Helpers.deepReferencedRemsFromRichText(
                     plugin,
-                    productRem,
-                    Helpers.includesStringInRem(REM_TEXT_CATEGORIES)
-                ).then(_.first);
-                return _.split(await Helpers.richTextToString(plugin, categoryRem?.backText), ',');
+                    productRem.text
+                ).then(FP.filter(_.isNotUndefined));
+
+                const categoryRems = await _.asyncMap(
+                    [productRem, ...allIngredientsRems],
+                    async (rem) => {
+                        return Helpers.getRems(
+                            plugin,
+                            rem,
+                            Helpers.includesStringInRem(REM_TEXT_CATEGORIES)
+                        ).then(_.first);
+                    }
+                ).then(FP.filter(_.isNotUndefined));
+
+                if (_.isEmpty(categoryRems)) return [''];
+                else {
+                    const categories = await _.asyncMap(categoryRems, async (categoryRem) => {
+                        return _.split(
+                            await Helpers.richTextToString(plugin, categoryRem?.backText),
+                            ','
+                        ).map(_.trim);
+                    });
+                    return _.uniq(_.flatten(categories));
+                }
             }),
         };
     });
 
-    const allCategories = _.uniq(allFoods.flatMap(({ categories }) => categories));
+    const allCategories = _.uniq(products.flatMap(({ categories }) => categories));
     const productsByCategories = allCategories.map((category) => {
         return products.filter(({ categories }) => {
             return categories.includes(category);
