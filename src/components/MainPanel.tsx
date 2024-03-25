@@ -14,18 +14,22 @@ export function MainPanel({ dailyDocs }: MainPanelProps) {
     const dailyDocsAndMain =
         App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
-                const others = await App.others(plugin, dailyDoc.rem);
-                const daysUntilEndOfYear = App.daysUntilEndOfYear(dailyDoc.name);
-                const daysUntilEndOfMonth = App.daysUntilEndOfMonth(dailyDoc.name);
-                const notesCount = await App.notesCount(plugin, dailyDoc.rem);
-                const theses = await App.theses(plugin, dailyDoc.rem);
                 return {
                     dailyDoc,
-                    others,
-                    daysUntilEndOfYear,
-                    daysUntilEndOfMonth,
-                    notesCount,
-                    theses,
+                    others: await App.others(plugin, dailyDoc.rem),
+                    daysUntilEndOfYear: App.daysUntilEndOfYear(dailyDoc.name),
+                    daysUntilEndOfMonth: App.daysUntilEndOfMonth(dailyDoc.name),
+                    notesCount: await App.notesCount(plugin, dailyDoc.rem),
+                    theses: await App.theses(plugin, dailyDoc.rem),
+                    zoomTitle: await _.block(async () => {
+                        const rem = await App.Helpers.getRems(
+                            plugin,
+                            dailyDoc.rem,
+                            App.Helpers.includesStringInRem(App.REM_TEXT_NOTES)
+                        ).then(_.head);
+                        if (_.isUndefined(rem)) return;
+                        else return () => void rem.openRemAsPage();
+                    }),
                 };
             });
         }, [plugin, dailyDocs]) ?? [];
@@ -35,10 +39,10 @@ export function MainPanel({ dailyDocs }: MainPanelProps) {
             <Day
                 key={dailyDoc.rem._id}
                 dailyDoc={dailyDoc}
+                title="Заметки"
+                zoomTitle={params.zoomTitle}
                 contentAfter={
-                    <span className="text-sm font-medium align-bottom ml-2">
-                        {params.notesCount} 🖊️
-                    </span>
+                    <span className="text-sm font-medium align-bottom">{params.notesCount} 🖊️</span>
                 }
             >
                 <div className="px-2">

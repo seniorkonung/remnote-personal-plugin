@@ -14,14 +14,26 @@ export function RitualPanel({ dailyDocs }: RitualPanelProps) {
     const dailyDocsAndRituals =
         App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
-                const rituals = await App.rituals(plugin, dailyDoc.rem);
-                return { dailyDoc, rituals };
+                return {
+                    dailyDoc,
+                    rituals: await App.rituals(plugin, dailyDoc.rem),
+                    zoomTitle: await _.block(async () => {
+                        const rem = await App.Helpers.getRems(
+                            plugin,
+                            dailyDoc.rem,
+                            App.Helpers.includesStringInRem(App.REM_TEXT_TOTALS),
+                            App.Helpers.includesStringInRem(App.REM_TEXT_RITUALS)
+                        ).then(_.head);
+                        if (_.isUndefined(rem)) return;
+                        else return () => void rem.openRemAsPage();
+                    }),
+                };
             });
         }, [plugin, dailyDocs]) ?? [];
 
-    const days = dailyDocsAndRituals.map(({ dailyDoc, rituals }) => {
+    const days = dailyDocsAndRituals.map(({ dailyDoc, rituals, zoomTitle }) => {
         return (
-            <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
+            <Day key={dailyDoc.rem._id} title="Ритуалы" zoomTitle={zoomTitle} dailyDoc={dailyDoc}>
                 <div className="grid grid-cols-2 gap-2 px-2">
                     {rituals.map((ritual) => {
                         return (

@@ -33,8 +33,20 @@ export function PomodoroPanel({ dailyDocs }: PomodoroPanelProps) {
     const dailyDocsAndPomodoros =
         App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
-                const pomodoros = await App.pomodoros(plugin, dailyDoc.rem);
-                return { dailyDoc, pomodoros };
+                return {
+                    dailyDoc,
+                    pomodoros: await App.pomodoros(plugin, dailyDoc.rem),
+                    zoomTitle: await _.block(async () => {
+                        const rem = await App.Helpers.getRems(
+                            plugin,
+                            dailyDoc.rem,
+                            App.Helpers.includesStringInRem(App.REM_TEXT_TOTALS),
+                            App.Helpers.includesStringInRem(App.REM_TEXT_POMODORO)
+                        ).then(_.head);
+                        if (_.isUndefined(rem)) return;
+                        else return () => void rem.openRemAsPage();
+                    }),
+                };
             });
         }, [plugin, dailyDocs]) ?? [];
 
@@ -57,10 +69,10 @@ export function PomodoroPanel({ dailyDocs }: PomodoroPanelProps) {
         );
     });
 
-    const days = dailyDocsAndPomodoros.map(({ dailyDoc, pomodoros }) => {
+    const days = dailyDocsAndPomodoros.map(({ dailyDoc, pomodoros, zoomTitle }) => {
         const total = calculateTotalPomodoros(pomodoros);
         return (
-            <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
+            <Day key={dailyDoc.rem._id} title="Помидоры" zoomTitle={zoomTitle} dailyDoc={dailyDoc}>
                 <div className="grid px-2">
                     {[...pomodoros, total].map((pomodoro) => {
                         return (

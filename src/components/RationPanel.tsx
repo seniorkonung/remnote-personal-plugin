@@ -14,12 +14,23 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
     const dailyDocsAndRations =
         App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
-                const rations = await App.rations(plugin, dailyDoc.rem);
-                return { dailyDoc, rations };
+                return {
+                    dailyDoc,
+                    rations: await App.rations(plugin, dailyDoc.rem),
+                    zoomTitle: await _.block(async () => {
+                        const rem = await App.Helpers.getRems(
+                            plugin,
+                            dailyDoc.rem,
+                            App.Helpers.includesStringInRem(App.REM_TEXT_RATIONS)
+                        ).then(_.head);
+                        if (_.isUndefined(rem)) return;
+                        else return () => void rem.openRemAsPage();
+                    }),
+                };
             });
         }, [plugin, dailyDocs]) ?? [];
 
-    const days = dailyDocsAndRations.map(({ dailyDoc, rations }) => {
+    const days = dailyDocsAndRations.map(({ dailyDoc, rations, zoomTitle }) => {
         const categories = _.chain(rations)
             .flatMap(({ snacks }) => _.flatten(snacks))
             .flatMap(({ categories }) => categories)
@@ -44,7 +55,7 @@ export function RationPanel({ dailyDocs }: RationPanelProps) {
             .value();
 
         return (
-            <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
+            <Day key={dailyDoc.rem._id} title="Рационы" zoomTitle={zoomTitle} dailyDoc={dailyDoc}>
                 <p className="flex flex-wrap gap-1">{categories}</p>
                 <ol className="grid gap-3 mt-6" style={{ paddingInlineStart: '1.6em' }}>
                     {rations.map((ration) => {

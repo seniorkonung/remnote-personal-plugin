@@ -14,14 +14,26 @@ export function SymptomPanel({ dailyDocs }: SymptomPanelProps) {
     const dailyDocsAndSymptoms =
         App.Hooks.useRunAsync(async () => {
             return _.asyncMap(dailyDocs, async (dailyDoc) => {
-                const symptoms = await App.symptoms(plugin, dailyDoc.rem);
-                return { dailyDoc, symptoms };
+                return {
+                    dailyDoc,
+                    symptoms: await App.symptoms(plugin, dailyDoc.rem),
+                    zoomTitle: await _.block(async () => {
+                        const rem = await App.Helpers.getRems(
+                            plugin,
+                            dailyDoc.rem,
+                            App.Helpers.includesStringInRem(App.REM_TEXT_TOTALS),
+                            App.Helpers.includesStringInRem(App.REM_TEXT_SYMPTOMS)
+                        ).then(_.head);
+                        if (_.isUndefined(rem)) return;
+                        else return () => void rem.openRemAsPage();
+                    }),
+                };
             });
         }, [plugin, dailyDocs]) ?? [];
 
-    const days = dailyDocsAndSymptoms.map(({ dailyDoc, symptoms }) => {
+    const days = dailyDocsAndSymptoms.map(({ dailyDoc, symptoms, zoomTitle }) => {
         return (
-            <Day key={dailyDoc.rem._id} dailyDoc={dailyDoc}>
+            <Day key={dailyDoc.rem._id} title="Симптомы" zoomTitle={zoomTitle} dailyDoc={dailyDoc}>
                 <ul className="grid gap-3" style={{ paddingInlineStart: '1.6em' }}>
                     {symptoms.map((symptom) => {
                         return <Symptom key={symptom.rem._id} symptom={symptom} />;
