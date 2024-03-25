@@ -25,6 +25,16 @@ export function MainPanel({ dailyDocs }: MainPanelProps) {
                         const rem = await App.Helpers.getRems(
                             plugin,
                             dailyDoc.rem,
+                            App.Helpers.includesStringInRem(App.REM_TEXT_TOTALS),
+                            App.Helpers.includesStringInRem(App.REM_TEXT_OTHER)
+                        ).then(_.head);
+                        if (_.isUndefined(rem)) return;
+                        else return () => void rem.openRemAsPage();
+                    }),
+                    zoomNotes: await _.block(async () => {
+                        const rem = await App.Helpers.getRems(
+                            plugin,
+                            dailyDoc.rem,
                             App.Helpers.includesStringInRem(App.REM_TEXT_NOTES)
                         ).then(_.head);
                         if (_.isUndefined(rem)) return;
@@ -41,7 +51,12 @@ export function MainPanel({ dailyDocs }: MainPanelProps) {
                 dailyDoc={dailyDoc}
                 zoom={params.zoom}
                 contentAfter={
-                    <span className="text-sm font-medium align-bottom">{params.notesCount} 🖊️</span>
+                    <span
+                        className="text-sm font-medium align-bottom cursor-pointer"
+                        onClick={params.zoomNotes}
+                    >
+                        {params.notesCount} 🖊️
+                    </span>
                 }
             >
                 <div className="px-2">
