@@ -186,7 +186,10 @@ export const richTextToEmbeddedHtml = async (
     _.forEach(node.querySelectorAll('a[isRemReference="true"]'), (a, i) => {
         if (a instanceof HTMLAnchorElement === false) return;
 
-        const color = remsInfo.at(i)?.color;
+        const remId = _.last(new URL(a.href).pathname.split('/')) ?? '';
+        const info = _.find(remsInfo, { id: remId });
+
+        const color = info?.color;
         if (_.isNotUndefined(color)) {
             a.style.padding = '0.1em 0.3em';
             a.style.borderRadius = '0.3em';
@@ -197,13 +200,13 @@ export const richTextToEmbeddedHtml = async (
         }
         a.classList.add('cursor-pointer');
 
-        const icon = remsInfo.at(i)?.icon;
+        const icon = info?.icon;
         if (_.isNotUndefined(icon)) {
             a.innerHTML = `<span>${icon}&nbsp;</span>` + a.innerHTML;
         }
 
+        a.setAttribute('data-rem-id', remId);
         a.removeAttribute('href');
-        a.setAttribute('data-rem-id', remsInfo.at(i)?.id ?? '');
     });
 
     return node.innerHTML;
