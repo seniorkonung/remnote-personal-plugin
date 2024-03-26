@@ -524,13 +524,29 @@ export const rations = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem): Promise<
             );
 
             const categories = await _.asyncMap(productRems, async (rem) => {
-                const categoryRem = await Helpers.getRems(
+                const allIngredientsRems = await Helpers.deepReferencedRemsFromRichText(
                     plugin,
-                    rem,
-                    Helpers.includesStringInRem(REM_TEXT_CATEGORIES)
-                ).then(_.first);
+                    rem.text
+                ).then(FP.filter(_.isNotUndefined));
 
-                return (await Helpers.richTextToString(plugin, categoryRem?.backText)).split(',');
+                const categoryRems = await _.asyncMap([rem, ...allIngredientsRems], async (rem) => {
+                    return Helpers.getRems(
+                        plugin,
+                        rem,
+                        Helpers.includesStringInRem(REM_TEXT_CATEGORIES)
+                    ).then(_.first);
+                }).then(FP.filter(_.isNotUndefined));
+
+                if (_.isEmpty(categoryRems)) return [''];
+                else {
+                    const categories = await _.asyncMap(categoryRems, async (categoryRem) => {
+                        return _.split(
+                            await Helpers.richTextToString(plugin, categoryRem?.backText),
+                            ','
+                        ).map(_.trim);
+                    });
+                    return _.uniq(_.flatten(categories));
+                }
             });
 
             const value = await Helpers.richTextToString(plugin, rem.backText);
