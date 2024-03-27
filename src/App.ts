@@ -870,3 +870,10 @@ export const addPortalProduct = async (plugin: SDK.RNPlugin, dailyRem: SDK.Rem):
     await portal?.setParent(newRem);
     await forPortalRem.addToPortal(portal);
 };
+
+export const PRODUCT_TAG_ID = 'product_tag_id';
+
+export const getProductTag = async (plugin: SDK.RNPlugin): Promise<SDK.Rem | undefined> => {
+    const tagId = await plugin.settings.getSetting(PRODUCT_TAG_ID);
+    return _.isString(tagId) ? await plugin.rem.findOne(tagId) : undefined;
+};

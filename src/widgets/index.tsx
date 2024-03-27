@@ -101,6 +101,11 @@ async function onActivate(plugin: SDK.ReactRNPlugin) {
         },
     });
 
+    await plugin.settings.registerStringSetting({
+        id: App.PRODUCT_TAG_ID,
+        title: 'ID теги продукта',
+    });
+
     plugin.event.addListener(
         EventQueueCompleteCard(plugin).eventId,
         EventQueueCompleteCard(plugin).listenerKey,
