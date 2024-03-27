@@ -60,7 +60,11 @@ export function Main(props: MainProps) {
                                 className="underline decoration-dotted underline-offset-4"
                                 style={{ textDecorationColor: `var(--text-color-${thesis.color})` }}
                             >
-                                <RichText embededdHtml={thesis.embeddedHtml} defaultValue="-" />
+                                <RichText
+                                    embededdHtml={thesis.embeddedHtml}
+                                    richText={undefined}
+                                    defaultValue="-"
+                                />
                             </span>
                         </div>
                     );
